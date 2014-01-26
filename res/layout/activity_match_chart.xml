@@ -1,0 +1,105 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MatchChartActivity" >
+
+    <RelativeLayout
+        android:id="@+id/serve_guide"
+	    android:background="#cc5500"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/location_guide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+	    android:background="#0066dd"
+       />
+
+    <RelativeLayout
+        android:id="@+id/shot_guide"
+	    android:background="#333333"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+        <ImageView
+            android:id="@+id/center_legend"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="#222"
+            android:paddingLeft="1dp"
+            android:paddingRight="1dp"
+            android:paddingTop="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/center_strokes" />
+
+        <TextView
+            android:id="@+id/right_hand"
+            android:layout_marginTop="5dp"
+            android:textColor="#999"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/left_hand"
+            android:layout_alignBottom="@+id/left_hand"
+            android:layout_alignParentRight="true"
+            android:text="@string/forehand"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageView
+            android:id="@+id/left_legend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/center_legend"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/left_strokes" />
+
+        <TextView
+            android:id="@+id/left_hand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:textColor="#999"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/backhand"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageView
+            android:id="@+id/right_legend"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/center_legend"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/right_strokes" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/long_press_anywhere_nto_end_point"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="#888"
+            android:textSize="12dp" />
+
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Tennis Charting</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="chart_new_match">Chart New Match</string>
+    <string name="review_matches">Review Matches</string>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
+    <string name="title_activity_match_chart">MatchChart</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="backhand">Backhand</string>
+    <string name="forehand">Forehand</string>
+    <string name="long_press_anywhere_nto_end_point">Long-press anywhere\\nto end point</string>
+
+</resources>
