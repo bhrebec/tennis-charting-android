@@ -1,10 +1,12 @@
-package com.example.tennischarting;
+package com.inklily.tennischarting;
 
-import com.example.tennischarting.util.SystemUiHider;
+import com.example.tennischarting.R;
+import com.inklily.tennischarting.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -29,10 +31,22 @@ public class MatchChartActivity extends Activity {
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
 	private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+	
+	private enum Handedness {
+		LEFT,
+		RIGHT
+	}
 
+	private enum Court {
+		NEAR_COURT,
+		FAR_COURT
+	}
+	
 	private PointF mGestureStart = new PointF();
 	private PointF mGestureEnd = new PointF();
 	private boolean mActiveGesture = false;
+
+
 	/**
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
@@ -43,6 +57,8 @@ public class MatchChartActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
 		setContentView(R.layout.activity_match_chart);
 
@@ -79,12 +95,21 @@ public class MatchChartActivity extends Activity {
 				mGestureEnd.y = event.getY();
 				break;
 			case MotionEvent.ACTION_UP:
-				// TODO: record point
+				mGestureEnd.x = event.getX();
+				mGestureEnd.y = event.getY();
+				recordPoint();
 				mActiveGesture = false;
 				break;
 		}
 		mGestureOverlay.invalidate();
 		return super.onTouchEvent(event);
+	}
+	
+	public void recordPoint() {
+	}
+
+	public String detectPoint() {
+		return "";
 	}
 	
 	public class GestureOverlay extends View {

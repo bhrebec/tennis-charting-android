@@ -1,4 +1,6 @@
-package com.example.tennischarting;
+package com.inklily.tennischarting;
+
+import com.example.tennischarting.R;
 
 import android.os.Bundle;
 import android.app.Activity;

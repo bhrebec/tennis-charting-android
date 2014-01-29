@@ -13,6 +13,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="backhand">Backhand</string>
     <string name="forehand">Forehand</string>
-    <string name="long_press_anywhere_nto_end_point">Long-press anywhere\\nto end point</string>
+    <string name="long_press_anywhere_to_end_point">Long-press anywhere\nto end point</string>
 
 </resources>

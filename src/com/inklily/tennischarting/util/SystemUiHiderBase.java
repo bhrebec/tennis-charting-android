@@ -1,4 +1,4 @@
-package com.example.tennischarting.util;
+package com.inklily.tennischarting.util;
 
 import android.app.Activity;
 import android.view.View;
