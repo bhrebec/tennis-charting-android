@@ -5,88 +5,76 @@
     android:layout_height="match_parent"
     tools:context=".MatchChartActivity" >
 
-    <RelativeLayout
-        android:id="@+id/serve_guide"
-	    android:background="#cc5500"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/location_guide"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-	    android:background="#0066dd"
-       />
-
-    <RelativeLayout
+    <view
+        class="com.inklily.tennischarting.MatchChartActivity$ShotGuide"
         android:id="@+id/shot_guide"
-	    android:background="#000"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-       >
+        android:background="#000" >
 
         <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        >
-	        <ImageView
-	            android:id="@+id/left_legend"
-	            android:layout_width="0dp"
-	            android:layout_height="match_parent"
-	            android:layout_weight="1.5"
-	            android:paddingTop="10dp"
-	            android:paddingLeft="10dp"
-	            android:paddingRight="10dp"
-	            android:scaleType="centerInside"
-	            android:src="@drawable/left_strokes" />
-	        <ImageView
-	            android:id="@+id/center_legend"
-	            android:layout_width="0dp"
-	            android:layout_height="match_parent"
-	            android:layout_weight="1"
-	            android:background="#111"
-	            android:paddingLeft="5dp"
-	            android:paddingRight="5dp"
-	            android:paddingTop="10dp"
-	            android:scaleType="centerInside"
-	            android:src="@drawable/center_strokes" />
-	        <ImageView
-	            android:id="@+id/right_legend"
-	            android:layout_width="0dp"
-	            android:layout_height="match_parent"
-	            android:layout_weight="1.5"
-	            android:paddingLeft="10dp"
-	            android:paddingRight="10dp"
-	            android:paddingTop="10dp"
-	            android:scaleType="centerInside"
-	            android:src="@drawable/right_strokes" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/left_legend"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/left_strokes" />
+
+            <ImageView
+                android:id="@+id/center_legend"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#111"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/center_strokes" />
+
+            <ImageView
+                android:id="@+id/right_legend"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/right_strokes" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/right_hand"
-            android:layout_marginTop="5dp"
-            android:textColor="#999"
-            android:layout_marginRight="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/left_hand"
             android:layout_alignBottom="@+id/left_hand"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
             android:text="@string/forehand"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#999" />
 
         <TextView
             android:id="@+id/left_hand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:textColor="#999"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
             android:text="@string/backhand"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#999" />
 
         <TextView
             android:id="@+id/exit_instruction"
@@ -94,11 +82,98 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:gravity="center"
             android:text="@string/long_press_anywhere_to_end_point"
             android:textAlignment="center"
-            android:gravity="center"
             android:textColor="#888"
             android:textSize="12dp" />
+    </view>
 
-    </RelativeLayout>
+    <view
+        android:id="@+id/serve_guide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.inklily.tennischarting.MatchChartActivity$ServeGuide"
+        android:background="#cc5500" >
+
+        <TextView
+            android:id="@+id/serve_body_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/serve_left_loc"
+            android:layout_alignBottom="@+id/serve_left_loc"
+            android:layout_centerHorizontal="true"
+            android:text="@string/serve_body"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/serve_left_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="43dp"
+            android:layout_marginTop="41dp"
+            android:text="@string/serve_t"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/serve_right_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/serve_body_loc"
+            android:layout_alignBottom="@+id/serve_body_loc"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="45dp"
+            android:text="@string/serve_wide"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+    </view>
+
+    <view
+        class="com.inklily.tennischarting.MatchChartActivity$LocationGuide"
+        android:id="@+id/location_guide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#6699cc" >
+
+        <TextView
+            android:id="@+id/shot_mid_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="28dp"
+            android:text="@string/shot_loc_midcourt"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/shot_right_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/shot_mid_loc"
+            android:layout_alignBottom="@+id/shot_mid_loc"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="39dp"
+            android:text="@string/serve_wide"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/shot_left_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/shot_mid_loc"
+            android:layout_alignBottom="@+id/shot_mid_loc"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="32dp"
+            android:text="@string/serve_t"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+    </view>
+
 </FrameLayout>

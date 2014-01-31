@@ -53,13 +53,51 @@ public class Point {
         BACKHAND_SWINGINGVOLLEY ('k'),
 		
 		STROKE_TRICK ('t'),
-		STROKE_UNKNOWN ('q');
+		STROKE_UNKNOWN ('q'),
+		NO_STROKE (' ');
 
 		private char value;
 		private Stroke(char v) { value = v; }
 		public char asChar() { return value; }
 		public String toString() { return Character.toString(value); }
 	}
+	
+	public abstract static class StrokeIndex {
+		public Stroke GROUNDSTROKE = Stroke.NO_STROKE;
+		public Stroke SLICE = Stroke.NO_STROKE;
+		public Stroke VOLLEY = Stroke.NO_STROKE;
+		public Stroke OVERHEAD = Stroke.NO_STROKE;
+		public Stroke LOB = Stroke.NO_STROKE;
+		public Stroke DROPSHOT = Stroke.NO_STROKE;
+		public Stroke HALFVOLLEY = Stroke.NO_STROKE;
+		public Stroke SWINGINGVOLLEY = Stroke.NO_STROKE;
+	}
+
+	public final static StrokeIndex FOREHAND_STROKES = new StrokeIndex() {
+		{
+		GROUNDSTROKE = Stroke.FOREHAND_GROUNDSTROKE;
+		SLICE = Stroke.FOREHAND_SLICE; 
+		VOLLEY = Stroke.FOREHAND_VOLLEY; 
+		OVERHEAD = Stroke.FOREHAND_OVERHEAD; 
+		DROPSHOT = Stroke.FOREHAND_DROPSHOT; 
+		HALFVOLLEY = Stroke.FOREHAND_HALFVOLLEY; 
+		SWINGINGVOLLEY = Stroke.FOREHAND_SWINGINGVOLLEY; 
+		LOB = Stroke.FOREHAND_LOB; 
+		}
+	};
+
+	public final static StrokeIndex BACKHAND_STROKES = new StrokeIndex() {
+		{
+		GROUNDSTROKE = Stroke.BACKHAND_GROUNDSTROKE;
+		SLICE = Stroke.BACKHAND_SLICE; 
+		VOLLEY = Stroke.BACKHAND_VOLLEY; 
+		OVERHEAD = Stroke.BACKHAND_OVERHEAD; 
+		DROPSHOT = Stroke.BACKHAND_DROPSHOT; 
+		HALFVOLLEY = Stroke.BACKHAND_HALFVOLLEY; 
+		SWINGINGVOLLEY = Stroke.BACKHAND_SWINGINGVOLLEY; 
+		LOB = Stroke.BACKHAND_LOB; 
+		}
+	};
 
 	public enum Direction {
         DEUCE ('1'), MIDDLE ('2'), AD ('3'), UNKNOWN ('0');
@@ -211,7 +249,7 @@ public class Point {
 		return data.toString();
 	}
 	
-	public boolean fault() {
+	public boolean isFault() {
 		return (winner() == returner() && shotCount() == 1);
 	}
 	
@@ -230,6 +268,10 @@ public class Point {
 	
 	public boolean isFirstServe() {
 		return mFirstServe;
+	}
+	
+	public int nextPlayer() {
+		return (shotCount() % 2) == 0 ? server() : returner();
 	}
 	
 }

@@ -14,5 +14,9 @@
     <string name="backhand">Backhand</string>
     <string name="forehand">Forehand</string>
     <string name="long_press_anywhere_to_end_point">Long-press anywhere\nto end point</string>
+    <string name="serve_t">T</string>
+    <string name="serve_body">Body</string>
+    <string name="serve_wide">Wide</string>
+    <string name="shot_loc_midcourt">Midcourt</string>
 
 </resources>
