@@ -18,5 +18,30 @@
     <string name="serve_body">Body</string>
     <string name="serve_wide">Wide</string>
     <string name="shot_loc_midcourt">Midcourt</string>
-
+	<string name="photo_licenses">The following photos were used: 
+	    "Dewey watches Wimbledon ("http://www.flickr.com/photos/aon/2664725415/) by angela n. 
+	    under CC BY 2.0, 
+	    "Broken Racket" (http://www.flickr.com/photos/spablab/957163667/) by spablab under CC BY 2.0,
+	    "Tennis" (http://www.flickr.com/photos/dcjohn/30515698/) by dcJohn under CC BY 2.0,
+	    "Tennis at Hersh Castle" (http://www.flickr.com/photos/harshlight/4027657471/) by HarshLight under CC BY 2.0. </string>
+	<string name="tournament_name">Tournament Name</string>
+	<string name="round">Round</string>
+	<string name="court">Court</string>
+	<string name="umpire">Umpire</string>
+	<string name="three_sets">3 sets</string>
+	<string name="five_sets">5 sets</string>
+	<string name="final_tb">Final Set Tiebreak</string>
+	<string name="no_final_tb">No Final Set Tiebreak</string>
+	<string name="charted_by">Charted by (your name)</string>
+	<string name="surface">Surface</string>
+	<string name="start_charting">Start Charting!</string>
+	<string name="men">Men</string>
+	<string name="women">Women</string>
+	<string name="left_handed">Left-handed</string>
+	<string name="right_handed">Right-handed</string>
+	<string name="player_1_name_prompt">Player 1\'s name (1st server)</string>
+	<string name="player_2_name_prompt">Player 2\'s name</string>
+	<string name="match_information">Match Information</string>
+	<string name="first_service_game_on_near_side">First service game on near side</string>
+	<string name="first_service_game_on_far_side">First service game on far side</string>
 </resources>

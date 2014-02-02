@@ -3,6 +3,7 @@ package com.inklily.tennischarting;
 import java.util.Timer;
 
 import com.example.tennischarting.R;
+import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 import com.inklily.tennischarting.Point.Direction;
 import com.inklily.tennischarting.Point.ServeDirection;
 import com.inklily.tennischarting.Point.Stroke;
@@ -95,15 +96,40 @@ public class MatchChartActivity extends Activity {
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
 		public void run() {
-			// TODO: launch point end activity
+			// TODO: show point end view
 		}
 		
 	};
+	
 	private Stroke currentStroke;
+	private SQLiteMatchStorage matchStorage;
+	private Handler handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		handler = new Handler(getMainLooper());
+		matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
+		
+		Long m_id = null;
+		if (savedInstanceState != null) {
+			savedInstanceState.getLong("match_id");
+		} else {
+			Bundle extras = this.getIntent().getExtras();
+			if (extras.containsKey("match_id")) {
+				m_id = extras.getLong("match_id");
+			}
+		}
+		
+		if (m_id != null) {
+			try {
+				match = matchStorage.retrieveMatch(m_id);
+			} catch (MatchStorageNotAvailableException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
@@ -200,36 +226,54 @@ public class MatchChartActivity extends Activity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int action = event.getAction();
-		if (current_state == State.STROKE) {
-			switch (action) {
-				case MotionEvent.ACTION_DOWN:
-					mGestureEnd.x = mGestureStart.x = event.getX();
-					mGestureEnd.y = mGestureStart.y = event.getY();
-					mActiveGesture = true;
-					break;
-				case MotionEvent.ACTION_MOVE:
-					mGestureEnd.x = event.getX();
-					mGestureEnd.y = event.getY();
-					break;
-				case MotionEvent.ACTION_UP:
-					mGestureEnd.x = event.getX();
-					mGestureEnd.y = event.getY();
-					mActiveGesture = false;
-					currentStroke = detectStroke();
-					nextState();
+		if (action == MotionEvent.ACTION_DOWN) {
+			handler.postDelayed(mLongPressRunnable, 1000);
+			if (current_state == State.STROKE) {
+				mGestureEnd.x = mGestureStart.x = event.getX();
+				mGestureEnd.y = mGestureStart.y = event.getY();
+				mActiveGesture = true;
 			}
-			mGestureOverlay.invalidate();
-		} else if (current_state == State.SERVE && action == MotionEvent.ACTION_UP) {
-			currentPoint.serve(serveGuide.getServeDirection(event.getX()));
-			Log.i("Server", currentPoint.toString());
+		} else if (action == MotionEvent.ACTION_UP) {
+			handler.removeCallbacks(mLongPressRunnable);
+			switch (current_state) {
+			case LOCATION:
+				recordStroke(locationGuide.getDirection(event.getX()));
+				break;
+			case STROKE:
+				mGestureEnd.x = event.getX();
+				mGestureEnd.y = event.getY();
+				mActiveGesture = false;
+				currentStroke = detectStroke();
+				break;
+			case SERVE:
+				currentPoint.serve(serveGuide.getServeDirection(event.getX()));
+				break;
+			}
 			nextState();
-		} else if (current_state == State.LOCATION && action == MotionEvent.ACTION_UP) {
-			recordStroke(locationGuide.getDirection(event.getX()));
-			nextState();
+		} else if (action == MotionEvent.ACTION_MOVE) {
+			if (current_state == State.STROKE) {
+				mGestureEnd.x = event.getX();
+				mGestureEnd.y = event.getY();
+			}
+		} else {
+			return super.onTouchEvent(event);
 		}
-		return super.onTouchEvent(event);
+		return false;
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		handler.removeCallbacks(mLongPressRunnable);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putLong("match_id", match.id);
+		
+		super.onSaveInstanceState(outState);
+	}
+
 	/**
 	 * Records the stroke based on the current gesture.
 	 * @param direction 
@@ -285,7 +329,6 @@ public class MatchChartActivity extends Activity {
 	}
 
 	public Point.Stroke detectStroke() {
-		int area;
 		float dX = mGestureStart.x  - mGestureEnd.x;
 		float dY = mGestureStart.y  - mGestureEnd.y;
 		boolean left = mGestureStart.x < centerLegend.getLeft();

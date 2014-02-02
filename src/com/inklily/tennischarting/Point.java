@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Point {
+	public Integer seq;
 	private StringBuilder data;
 
 	private boolean mFirstServe;

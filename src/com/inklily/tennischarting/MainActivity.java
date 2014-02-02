@@ -19,10 +19,22 @@ public class MainActivity extends Activity {
 		findViewById(R.id.btn_chart_new_match).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent it = new Intent(MainActivity.this, MatchChartActivity.class);
+				Intent it = new Intent(MainActivity.this, MatchInfoActivity.class);
 				startActivity(it);
 			}
 		});
+
+		// Spin up the db to prevent delays
+		SQLiteMatchStorage.getGlobalInstance(this.getApplication());
+	}
+	
+	
+
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		SQLiteMatchStorage.closeGlobalInstance();
 	}
 
 	@Override
