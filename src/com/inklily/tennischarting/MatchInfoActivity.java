@@ -17,6 +17,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
+/**
+ * Activity to create a match or edit an existing match's properties.
+ * @author mrdog
+ *
+ */
 public class MatchInfoActivity extends Activity implements OnClickListener {
 
 	private AutoCompleteTextView player1_name;
@@ -64,7 +69,7 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
         m.round = ((TextView) findViewById(R.id.match_round)).getText().toString();
         
         TimePicker timep = ((TimePicker) findViewById(R.id.match_time));
-        m.time = String.format("%02d:%0d", timep.getCurrentHour(), timep.getCurrentMinute());
+        m.time = String.format("%02d:%02d", timep.getCurrentHour(), timep.getCurrentMinute());
         m.court = ((TextView) findViewById(R.id.match_court)).getText().toString();
         m.surface =((TextView) findViewById(R.id.match_surface)).getText().toString();
         m.umpire =((TextView) findViewById(R.id.match_umpire)).getText().toString();

@@ -45,12 +45,12 @@ public class SQLiteMatchStorage implements MatchStorage {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("CREATE DATABASE match(id INTEGER, " +
+			db.execSQL("CREATE TABLE match(id INTEGER, " +
 					"player1, player2 , player1hand , player2hand , " +
 					"date, tournament, round, time, court, surface, " +
-					"umpire, sets, final_tb, charted_by, complete, near" +
+					"umpire, sets, final_tb, charted_by, complete, near, " +
 					"PRIMARY KEY (id))");
-			db.execSQL("CREATE DATABASE point(match_id INTEGER, " +
+			db.execSQL("CREATE TABLE point(match_id INTEGER, " +
                     "seq INTEGER, point TEXT, first_serve, server, UNIQUE(match_id, seq))");
 		}
 
@@ -69,6 +69,7 @@ public class SQLiteMatchStorage implements MatchStorage {
 			try {
 				return helpers[0].getWritableDatabase();
 			} catch (SQLiteException ex) {
+				ex.printStackTrace();
 				failure = true;
 				return null;
 			}
@@ -86,7 +87,8 @@ public class SQLiteMatchStorage implements MatchStorage {
 	
 	public SQLiteMatchStorage(Context cxt) {
 		helper = MatchSQLHelper.makeHelper(cxt);
-		new DBOpenAsync().execute(helper);
+		//new DBOpenAsync().execute(helper);
+		db = helper.getWritableDatabase();
 	}
 
 	public void close() {

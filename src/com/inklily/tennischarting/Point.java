@@ -55,6 +55,7 @@ public class Point {
 		
 		STROKE_TRICK ('t'),
 		STROKE_UNKNOWN ('q'),
+		STROKE_LETCORE ('c'),
 		NO_STROKE (' ');
 
 		private char value;
@@ -126,7 +127,8 @@ public class Point {
 
 	public enum PointOutcome {
 		WINNER('*'), ACE('*'), UNRETURNABLE('#'), 
-		NET ('n'), WIDE ('w'), DEEP ('d'), WIDE_DEEP ('x'), SHANK ('!'), UNKNOWN ('e');
+		NET ('n'), WIDE ('w'), DEEP ('d'), WIDE_DEEP ('x'), SHANK ('!'), UNKNOWN ('e'),
+		FOOT_FAULT ('g');
 		private char value;
 		private PointOutcome(char v) { value = v; }
 		public char asChar() { return value; }
@@ -185,11 +187,17 @@ public class Point {
 		endPoint(o, null);
 	}
 
+	public void endPoint(Point.ErrorType o) {
+		endPoint(null, o);
+	}
+
 	public void endPoint(Point.PointOutcome o, Point.ErrorType et) {
 		if (o != null) {
 			data.append(o.asChar());
 			if (o != PointOutcome.WINNER && et != null)
 				data.append(et.asChar());
+		} else if (et != null) {
+			data.append(et.asChar());
 		}
 	}
 	

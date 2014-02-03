@@ -1,14 +1,13 @@
 package com.inklily.tennischarting;
 
 import java.util.Timer;
-
 import com.example.tennischarting.R;
 import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 import com.inklily.tennischarting.Point.Direction;
 import com.inklily.tennischarting.Point.ServeDirection;
 import com.inklily.tennischarting.Point.Stroke;
 import com.inklily.tennischarting.util.SystemUiHider;
-
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -64,6 +63,7 @@ public class MatchChartActivity extends Activity {
 		SERVE,
 		LOCATION,
 		STROKE,
+		END_POINT,
 	}
 	
 	private State current_state = State.SERVE;
@@ -91,12 +91,14 @@ public class MatchChartActivity extends Activity {
 	private GuideView shotGuide;
 	private ServeGuide serveGuide;
 	private LocationGuide locationGuide;
+	private PointEndMenu pointEndMenu;
 	private View centerLegend;
 
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
 		public void run() {
-			// TODO: show point end view
+			current_state = State.END_POINT;
+			pointEndMenu.show(currentPoint.shotCount() < 1);
 		}
 		
 	};
@@ -105,6 +107,7 @@ public class MatchChartActivity extends Activity {
 	private SQLiteMatchStorage matchStorage;
 	private Handler handler;
 
+	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -130,8 +133,11 @@ public class MatchChartActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
-		
-		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+		} else {
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		}
 
 		setContentView(R.layout.activity_match_chart);
 
@@ -139,6 +145,7 @@ public class MatchChartActivity extends Activity {
 		shotGuide = (GuideView) findViewById(R.id.shot_guide);
 		locationGuide = (LocationGuide) findViewById(R.id.location_guide);
 		serveGuide = (ServeGuide) findViewById(R.id.serve_guide);
+		pointEndMenu = (PointEndMenu) findViewById(R.id.point_end_menu);
 		centerLegend = findViewById(R.id.center_legend);
 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
