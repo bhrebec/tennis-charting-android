@@ -3,7 +3,7 @@
     android:id="@+id/fullscreen_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MatchChartActivity" >
+    tools:context=".MatchChartActivity">
 
     <view
         class="com.inklily.tennischarting.MatchChartActivity$ShotGuide"
@@ -21,6 +21,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
+                android:contentDescription="@string/left_legend_description"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
@@ -33,6 +34,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="#111"
+                android:contentDescription="@string/center_legend_description"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:paddingTop="10dp"
@@ -44,6 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
+                android:contentDescription="@string/right_legend_description"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
@@ -86,7 +89,7 @@
             android:text="@string/long_press_anywhere_to_end_point"
             android:textAlignment="center"
             android:textColor="#888"
-            android:textSize="12dp" />
+            android:textSize="12sp" />
     </view>
 
     <view
@@ -173,6 +176,226 @@
             android:text="@string/serve_t"
             android:textColor="#fff"
             android:textSize="24sp" />
+
+    </view>
+
+    <view
+        class="com.inklily.tennischarting.PointEndMenu"
+        android:id="@+id/point_end_menu"
+        
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <EditText
+            android:id="@+id/point_edit_box"
+            android:imeOptions="flagNoExtractUi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/point_edit_point"
+            android:background="#444"
+            android:hint="point"
+            android:height="32dp"
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/edit_point_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            
+            android:background="@drawable/point_note_btn_bg"
+            android:textColor="#fff"
+            android:layout_margin="2dp"
+            android:padding="4dp"
+            android:minHeight="0dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/point_edit_box"
+            android:text="@string/edit_point" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/point_edit_box" >
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent" >
+                <RadioGroup
+                    android:id="@+id/point_end_group"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical" >
+
+                    <RadioButton
+                        android:id="@+id/point_winner"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/winner" />
+
+                    <RadioButton
+                        android:id="@+id/point_forced_error"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/forced_error" />
+
+                    <RadioButton
+                        android:id="@+id/point_unforced_error"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/unforced_error" />
+
+                    <RadioButton
+                        android:id="@+id/point_unknown_point"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/unknown_point"
+                        android:checked="true" 
+                        />
+
+                    <Button
+                        android:id="@+id/point_penalty_point"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/point_penalty" />
+                </RadioGroup>
+                <RadioGroup
+                    android:id="@+id/serve_end_group"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical" >
+
+                    <RadioButton
+                        android:id="@+id/point_ace"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/ace" />
+
+                    <RadioButton
+                        android:id="@+id/point_service_winner"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/service_winner" />
+
+                    <RadioButton
+                        android:id="@+id/point_fault"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/fault"
+                        android:checked="true" 
+                        />
+					<Button
+                        android:id="@+id/point_letcord"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/letchord"
+                        />
+					<RadioButton
+                        android:id="@+id/point_unknown_serve"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/unknown_point"
+                        />
+                    <Button
+                        android:id="@+id/point_penalty_serve"
+                        style="@style/PointEndOutcomeButton"
+                        android:text="@string/point_penalty" />
+                </RadioGroup>
+            </FrameLayout>
+
+			<RadioGroup
+			    android:id="@+id/point_error_group"
+			   	android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"			     
+			    >
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"			     
+                android:orientation="vertical" >
+                <RadioButton
+	              android:id="@+id/point_error_net"
+	              style="@style/PointErrorButton"
+	              android:layout_weight="1"
+	              android:text="@string/net" />
+                <RadioButton
+	              android:id="@+id/point_error_wide"
+	              style="@style/PointErrorButton"
+	              android:layout_weight="1"
+	              android:text="@string/wide" />
+                <RadioButton
+	              android:id="@+id/point_error_deep"
+	              style="@style/PointErrorButton"
+	              android:layout_weight="1"
+	              android:text="@string/deep" />
+				
+                        
+	        </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
+             <RadioButton
+                  android:id="@+id/point_error_wide_deep"
+                  style="@style/PointErrorButton"
+                  android:layout_weight="1"
+                  android:text="@string/wide_and_deep" />
+                  <RadioButton
+                  android:id="@+id/point_error_shank"
+                  style="@style/PointErrorButton"
+                  android:layout_weight="1"
+                  android:text="@string/shank" />
+                    <RadioButton
+                  android:id="@+id/point_error_unknown"
+                  style="@style/PointErrorButton"
+                  android:layout_weight="1"
+                  android:checked="true"
+                  android:text="@string/unknown_error" />
+                    <RadioButton
+                  android:id="@+id/point_error_foot_fault"
+                  style="@style/PointErrorButton"
+                  android:layout_weight="1"
+                  android:text="@string/foot_fault" />
+                </LinearLayout>
+			</RadioGroup>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/point_add_note"
+                    style="@style/PointEndFinishButton"
+                    android:layout_weight="1"
+                    android:background="@drawable/point_note_btn_bg"
+                    android:text="@string/add_note"
+                    tools:ignore="NestedWeights" />
+
+                <Button
+                    android:id="@+id/point_retire"
+                    style="@style/PointEndFinishButton"
+                    android:layout_weight="1"
+                    android:text="@string/retirement" />
+
+                <Button
+                    android:id="@+id/point_continue_point"
+                    style="@style/PointEndFinishButton"
+                    android:layout_weight="1"
+                    android:text="@string/cancel_point" />
+
+                <Button
+                    android:id="@+id/point_next_point"
+                    style="@style/PointEndFinishButton"
+                    android:layout_weight="1.25"
+                    android:background="@drawable/point_next_btn_bg"
+                    android:text="@string/next_point" />
+            </LinearLayout>
+
+        </LinearLayout>
 
     </view>
 

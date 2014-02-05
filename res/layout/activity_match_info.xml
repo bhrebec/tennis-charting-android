@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#112"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical" >
+
+        <AutoCompleteTextView
+            android:id="@+id/match_p1_name"
+            android:imeOptions="flagNoExtractUi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/player_1_name_prompt"
+            android:inputType="textPersonName" >
+
+            <requestFocus />
+        </AutoCompleteTextView>
+
+        <RadioGroup
+            android:id="@+id/p1_handed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/match_p1_left_handed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_handed" />
+
+            <RadioButton
+                android:id="@+id/match_p1_right_handed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/right_handed" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:padding="3dp"
+        android:orientation="vertical" >
+
+        <AutoCompleteTextView
+            android:id="@+id/match_p2_name"
+            android:imeOptions="flagNoExtractUi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/player_2_name_prompt"
+            android:inputType="textPersonName" />
+
+        <RadioGroup
+            android:id="@+id/match_p2_handed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/match_p2_left_handed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/left_handed" />
+
+            <RadioButton
+                android:id="@+id/match_p2_right_handed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:checked="true"
+                android:text="@string/right_handed" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:padding="3dp"
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RadioGroup
+            android:id="@+id/RadioGroup01"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/match_women"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/women" />
+
+            <RadioButton
+                android:id="@+id/match_men"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/men" />
+        </RadioGroup>
+
+        <DatePicker
+            android:id="@+id/match_date"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TimePicker
+            android:id="@+id/match_time"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/match_tournament"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/tournament_name" />
+
+        <EditText
+            android:id="@+id/match_round"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/round" />
+
+        <EditText
+            android:id="@+id/match_court"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/court" />
+
+        <EditText
+            android:id="@+id/match_surface"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/surface" />
+
+        <EditText
+            android:id="@+id/match_umpire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/umpire" />
+
+        <RadioGroup
+            android:id="@+id/RadioGroup02"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/match_three_sets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/three_sets" />
+
+            <RadioButton
+                android:id="@+id/match_five_sets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/five_sets" />
+
+        </RadioGroup>
+
+        <ToggleButton
+            android:id="@+id/match_final_set_tb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOff="@string/no_final_tb"
+            android:textOn="@string/final_tb" />
+        <EditText
+            android:id="@+id/match_charted_by"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/charted_by" />
+        <ToggleButton
+            android:id="@+id/match_first_serve_near"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOff="@string/first_service_game_on_far_side"
+            android:textOn="@string/first_service_game_on_near_side" />
+        
+        <Button
+            android:id="@+id/match_start_charting"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start_charting" />
+
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>

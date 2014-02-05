@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -34,5 +34,31 @@
     </style>
 
     <style name="ButtonBarButton" />
-
+    <style name="mainMenuButton">
+        <item name="android:textColor">@color/main_menu_button</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">5dp</item>
+    </style>
+    <style name="PointEndButton">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>        
+    </style>
+    <style name="PointEndOutcomeButton" parent="PointEndButton">
+        <item name="android:background">@drawable/point_type_btn_bg</item>
+        <item name="android:textColor">#fff</item>
+    </style>
+    <style name="PointEndFinishButton" parent="PointEndButton">
+        <item name="android:background">@drawable/point_finish_btn_bg</item>
+        <item name="android:textColor">#fff</item>
+    </style>
+    <style name="PointErrorButton" parent="PointEndButton">
+        <item name="android:background">@drawable/point_error_btn_bg</item>
+        <item name="android:textColor">#fff</item>
+    </style>
+    
 </resources>
