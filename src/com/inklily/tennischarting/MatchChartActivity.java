@@ -1,16 +1,21 @@
 package com.inklily.tennischarting;
 
 import java.util.Timer;
+
 import com.example.tennischarting.R;
 import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 import com.inklily.tennischarting.Point.Direction;
 import com.inklily.tennischarting.Point.ServeDirection;
 import com.inklily.tennischarting.Point.Stroke;
 import com.inklily.tennischarting.util.SystemUiHider;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -42,7 +47,7 @@ import android.widget.TextView;
  * 
  * @author mrdog
  */
-public class MatchChartActivity extends Activity {
+public class MatchChartActivity extends Activity implements OnDismissListener, OnCancelListener {
 	/**
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
@@ -63,7 +68,6 @@ public class MatchChartActivity extends Activity {
 		SERVE,
 		LOCATION,
 		STROKE,
-		END_POINT,
 	}
 	
 	private State current_state = State.SERVE;
@@ -73,6 +77,7 @@ public class MatchChartActivity extends Activity {
 	private boolean mActiveGesture = false;
 	private boolean nextStrokeRightHanded = true;
 	private boolean nextStrokeNear = true;
+	private boolean disableInput;
 	
 	private Match match;
 	private Point currentPoint;
@@ -96,7 +101,7 @@ public class MatchChartActivity extends Activity {
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
 		public void run() {
-			current_state = State.END_POINT;
+			disableInput = true;
 			pointEndMenu.show(currentPoint.shotCount() < 1);
 		}
 		
@@ -113,7 +118,7 @@ public class MatchChartActivity extends Activity {
 		
 		handler = new Handler(getMainLooper());
 		matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
-		
+		disableInput = false;
 		Long m_id = null;
 		if (savedInstanceState != null) {
 			savedInstanceState.getLong("match_id");
@@ -144,7 +149,9 @@ public class MatchChartActivity extends Activity {
 		shotGuide = (GuideView) findViewById(R.id.shot_guide);
 		locationGuide = (LocationGuide) findViewById(R.id.location_guide);
 		serveGuide = (ServeGuide) findViewById(R.id.serve_guide);
-		pointEndMenu = (PointEndMenu) findViewById(R.id.point_end_menu);
+		pointEndMenu = new PointEndMenu(this);
+		pointEndMenu.setOnDismissListener(this);
+
 		centerLegend = findViewById(R.id.center_legend);
 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -232,6 +239,9 @@ public class MatchChartActivity extends Activity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int action = event.getAction();
+		if (disableInput)
+			return false;
+
 		if (action == MotionEvent.ACTION_DOWN) {
 			handler.postDelayed(mLongPressRunnable, 1000);
 			if (current_state == State.STROKE) {
@@ -253,6 +263,8 @@ public class MatchChartActivity extends Activity {
 				break;
 			case SERVE:
 				currentPoint.serve(serveGuide.getServeDirection(event.getX()));
+				break;
+			default:
 				break;
 			}
 			nextState();
@@ -607,5 +619,16 @@ public class MatchChartActivity extends Activity {
 				right_hand.setText(R.string.backhand);
 			}
 		}
+	}
+
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		disableInput = false;
+		this.current_state = State.SERVE;
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		disableInput = false;
 	}
 }

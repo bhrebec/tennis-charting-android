@@ -60,5 +60,15 @@
         <item name="android:background">@drawable/point_error_btn_bg</item>
         <item name="android:textColor">#fff</item>
     </style>
-    
+    <style name="PointDialogTheme" parent="android:Theme.Dialog">
+        <!-- Fill the screen -->
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+
+        <!-- No backgrounds, titles or window float -->
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>      
+    </style>
+
 </resources>

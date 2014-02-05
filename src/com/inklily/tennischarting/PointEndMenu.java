@@ -4,9 +4,14 @@ import java.util.Map;
 
 import com.example.tennischarting.R;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -15,7 +20,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 
 
-public class PointEndMenu extends RelativeLayout {
+public class PointEndMenu extends Dialog {
 	private RadioGroup serveEndGroup;
 	private RadioGroup pointEndGroup;
 	private RadioGroup errorGroup;
@@ -26,6 +31,7 @@ public class PointEndMenu extends RelativeLayout {
 	private Button editPoint;
 	private EditText pointEditor;
 	private RadioButton footFault;
+	private ViewGroup rootView;
 	
 	private static Map<Integer, Point.PointOutcome> pointOutcomeMap = new HashMap<Integer, Point.PointOutcome>();
 	{
@@ -41,13 +47,12 @@ public class PointEndMenu extends RelativeLayout {
 		pointOutcomeMap.put(R.id.point_error_foot_fault, Point.PointOutcome.FOOT_FAULT);
 	}
 
-	public PointEndMenu(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setVisibility(View.GONE);
-	}
-	
-	public void hide() {
-		setVisibility(View.GONE);
+	public PointEndMenu(Context context) {
+		super(context, R.style.PointDialogTheme);
+		getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(180, 0, 0, 0)));
+		setContentView(R.layout.point_end_dialog);
+		rootView = (ViewGroup) findViewById(R.id.point_end_menu);
+		setup();
 	}
 	
 	public void setup() {
@@ -58,11 +63,10 @@ public class PointEndMenu extends RelativeLayout {
 				if (id == R.id.point_fault) {
 					errorGroup.setVisibility(View.VISIBLE);
 				} else {
-					errorGroup.setVisibility(View.GONE);
+					errorGroup.setVisibility(View.INVISIBLE);
 				}
-				
+				rootView.invalidate();
 			}
-			
 		});
 		
 		pointEndGroup = (RadioGroup) findViewById(R.id.point_end_group);
@@ -72,28 +76,31 @@ public class PointEndMenu extends RelativeLayout {
 				if (id == R.id.point_unforced_error || id == R.id.point_forced_error) {
 					errorGroup.setVisibility(View.VISIBLE);
 				} else {
-					errorGroup.setVisibility(View.GONE);
+					errorGroup.setVisibility(View.INVISIBLE);
 				}
-				
+				rootView.invalidate();
 			}
 		});
 		
 		errorGroup = (RadioGroup) findViewById(R.id.point_error_group);
 		addNote = (Button) findViewById(R.id.point_add_note);
 		continuePoint = (Button) findViewById(R.id.point_continue_point);
+		continuePoint.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				PointEndMenu.this.cancel();
+			}
+		});
+
 		nextPoint = (Button) findViewById(R.id.point_next_point);
 		retire = (Button) findViewById(R.id.point_retire);
-		editPoint = (Button) findViewById(R.id.point_edit_point);
+		editPoint = (Button) findViewById(R.id.edit_point_btn);
 		pointEditor = (EditText) findViewById(R.id.point_edit_box);
 		footFault = (RadioButton) findViewById(R.id.point_error_foot_fault);
 	}
 	
 	public void show(boolean serveMode) {
-		if (serveEndGroup == null)
-			setup();
-		
-		setVisibility(View.VISIBLE);
-		errorGroup.setVisibility(View.GONE);
+		errorGroup.setVisibility(View.INVISIBLE);
 		if (serveMode) {
 			serveEndGroup.setVisibility(View.VISIBLE);
 			pointEndGroup.setVisibility(View.GONE);
@@ -105,5 +112,7 @@ public class PointEndMenu extends RelativeLayout {
 			footFault.setVisibility(View.INVISIBLE);
 			pointEndGroup.clearCheck();
 		}
+
+		this.show();
 	}
 }
