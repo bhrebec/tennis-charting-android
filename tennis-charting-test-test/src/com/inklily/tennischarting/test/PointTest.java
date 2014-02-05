@@ -26,22 +26,22 @@ public class PointTest extends TestCase {
 
 	public void testServe() {
 		assertEquals(new Point(true, 1, "4*").winner(), 1);
-		assertFalse(new Point(true, 1, "4*").fault());
+		assertFalse(new Point(true, 1, "4*").isFault());
 		assertEquals(new Point(true, 1, "5#").winner(), 1);
-		assertFalse(new Point(true, 1, "5#").fault());
+		assertFalse(new Point(true, 1, "5#").isFault());
 		assertEquals(new Point(true, 1, "6w").winner(), 2);
-		assertTrue(new Point(true, 1, "6w").fault());
+		assertTrue(new Point(true, 1, "6w").isFault());
 
 		assertEquals(new Point(true, 2, "4e").winner(), 1);
-		assertTrue(new Point(true, 2, "4e").fault());
+		assertTrue(new Point(true, 2, "4e").isFault());
 		assertEquals(new Point(true, 2, "5x").winner(), 1);
-		assertTrue(new Point(true, 2, "5x").fault());
+		assertTrue(new Point(true, 2, "5x").isFault());
 		assertEquals(new Point(true, 2, "6d").winner(), 1);
-		assertTrue(new Point(true, 2, "6d").fault());
+		assertTrue(new Point(true, 2, "6d").isFault());
 		assertEquals(new Point(true, 2, "6!").winner(), 1);
-		assertTrue(new Point(true, 2, "6!").fault());
+		assertTrue(new Point(true, 2, "6!").isFault());
 		assertEquals(new Point(true, 2, "6n").winner(), 1);
-		assertTrue(new Point(true, 2, "6n").fault());
+		assertTrue(new Point(true, 2, "6n").isFault());
 	}
 
 	public void testReturnShot() {

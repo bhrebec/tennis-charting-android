@@ -79,7 +79,6 @@ public class MatchChartActivity extends Activity {
 	private boolean locRighthanded;
 	private boolean strokeRighthanded;
 	
-
 	/**
 	 * The instance of the {@link SystemUiHider} for this activity.
 	 */
@@ -285,7 +284,6 @@ public class MatchChartActivity extends Activity {
 	}
 
 	public Point.Stroke detectStroke() {
-		int area;
 		float dX = mGestureStart.x  - mGestureEnd.x;
 		float dY = mGestureStart.y  - mGestureEnd.y;
 		boolean left = mGestureStart.x < centerLegend.getLeft();
