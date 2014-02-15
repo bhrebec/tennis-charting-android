@@ -2,6 +2,11 @@ package com.inklily.tennischarting;
 
 import java.util.List;
 
+/**
+ * Scorekeeping class.
+ * @author mrdog
+ *
+ */
 public class Score {
 	private int[] p1_games;
 	private int[] p1_tbs;
@@ -24,6 +29,10 @@ public class Score {
 		reset_score();
 	}
 	
+	/**
+	 * Set the number of sets and recalculate the score.
+	 * @param sets
+	 */
 	public void setSets(int sets) {
 		mSets = sets;
 
@@ -54,7 +63,11 @@ public class Score {
 		}
 		return c;
 	}
-	int server() {
+	
+	/**
+	 * Returns the id of the server.
+	 */
+	public int server() {
 		int server = games() % 2 + 1;
 		if (in_tb()) {
 			int pts = p1_pts + p2_pts;
@@ -66,6 +79,10 @@ public class Score {
 		return server;
 	}
 	
+	/**
+	 * Adds a point to the score.
+	 * @param p point to score
+	 */
 	void score_point(Point p) {
 		if (mCurrentSet == mSets)
 			return; // Match is over
@@ -83,7 +100,11 @@ public class Score {
 		normalize_score();
 	}
 	
-	private boolean in_tb() {
+	/**
+	 * True if this is a tiebreak.
+	 * @return
+	 */
+	public boolean in_tb() {
 		if (p1_games[mCurrentSet] == 6 
 				&& p2_games[mCurrentSet] == 6
 				&& !(mCurrentSet == mSets - 1 && !mFinalTb)) {
@@ -93,6 +114,9 @@ public class Score {
 		}
 	}
 
+	/**
+	 * Makes a new set. 
+	 */
 	private void new_set() {
 		int p1_game = p1_games[mCurrentSet];
 		int p2_game = p2_games[mCurrentSet];
@@ -101,6 +125,11 @@ public class Score {
 		}
 	}
 
+	/**
+	 * Makes a new games.
+	 * 
+	 * Translate games into points, update structures for new game.
+	 */
 	private void new_game() {
 		if (p1_pts > p2_pts)
 			p1_games[mCurrentSet]++;
@@ -122,6 +151,9 @@ public class Score {
 			new_set();
 	}
 
+	/** 
+	 * Translate points into games as needed.
+	 */
 	private void normalize_score() {
 		if (in_tb()) {
 			if (p1_pts > 6 && p1_pts - p2_pts > 1) {
@@ -138,6 +170,9 @@ public class Score {
 		}
 	}
 
+	/**
+	 * Recalculate score for the given points.
+	 */
 	public void reScore(List<Point> points) {
 		reset_score();
 		for (Point p : points)
@@ -163,10 +198,16 @@ public class Score {
 		return score.toString();
 	}
 	
+	/**
+	 * Returns true if serve is from the deuce court.
+	 */
 	public boolean deuceCourt() {
 		return ((p1_pts + p2_pts) % 2 == 0);
 	}
 
+	/**
+	 * Returns true if server is near to the camera.
+	 */
 	public boolean near() {
 		boolean near = (((games() + 1) / 2) % 2) == 0;
 		if (in_tb() && (((p1_pts + p2_pts) / 6) % 2 == 1))

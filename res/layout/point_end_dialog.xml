@@ -16,6 +16,7 @@
          android:layout_alignParentTop="true"
          android:layout_toLeftOf="@+id/edit_point_btn"
          android:background="#444"
+         android:textColor="#eee"
          android:hint=""
          android:height="32dp"
          android:ems="10" >
@@ -71,7 +72,7 @@
                      style="@style/PointEndOutcomeButton"
                      android:text="@string/unforced_error" />
 
-                 <RadioButton
+                 <Button
                      android:id="@+id/point_unknown_point"
                      style="@style/PointEndOutcomeButton"
                      android:text="@string/unknown_point"
@@ -105,7 +106,7 @@
                      android:text="@string/fault"
                      android:checked="true" 
                      />
-				<RadioButton
+				<Button
                      android:id="@+id/point_unknown_serve"
                      style="@style/PointEndOutcomeButton"
                      android:text="@string/unknown_point"
@@ -122,14 +123,15 @@
              </RadioGroup>
          </FrameLayout>
 
-<RadioGroup
-    android:id="@+id/point_error_group"
+<LinearLayout
+     android:id="@+id/point_errors"
    	android:layout_width="0dp"
              android:layout_weight="2"
              android:layout_height="match_parent"
              android:orientation="horizontal"			     
     >
-         <LinearLayout
+         <RadioGroup
+		     android:id="@+id/point_error_group_A"
              android:layout_width="0dp"
              android:layout_height="match_parent"
              android:layout_weight="1"			     
@@ -149,11 +151,10 @@
             style="@style/PointErrorButton"
             android:layout_weight="1"
             android:text="@string/deep" />
-	
-                     
-      </LinearLayout>
+         </RadioGroup>
 
-             <LinearLayout
+         <RadioGroup
+		         android:id="@+id/point_error_group_B"
                  android:layout_width="0dp"
                  android:layout_weight="1"
                  android:layout_height="match_parent"
@@ -179,8 +180,8 @@
                style="@style/PointErrorButton"
                android:layout_weight="1"
                android:text="@string/foot_fault" />
-             </LinearLayout>
-</RadioGroup>
+             </RadioGroup>
+		</LinearLayout>
          <LinearLayout
              android:layout_width="0dp"
              android:layout_height="match_parent"

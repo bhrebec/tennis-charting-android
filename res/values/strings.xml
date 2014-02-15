@@ -54,7 +54,7 @@
 	<string name="net">Net</string>
 	<string name="wide">Wide</string>
 	<string name="deep">Deep</string>
-	<string name="wide_and_deep">Wide &amp;amp; Deep</string>
+	<string name="wide_and_deep">Wide &amp; Deep</string>
 	<string name="shank">Shank</string>
 	<string name="unknown_error">Unknown Error</string>
 	<string name="foot_fault">Foot Fault</string>
@@ -67,6 +67,6 @@
 	<string name="letchord">Letchord</string>
 	<string name="add_note">Add Note</string>
 	<string name="retirement">Retirement</string>
-	<string name="cancel_point">Cancel &amp; Continue Point</string>
+	<string name="cancel_point">Continue Point</string>
 	<string name="next_point">Next Point</string>
 </resources>

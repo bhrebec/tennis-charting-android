@@ -14,9 +14,9 @@ public class Point {
 	
 	// TODO: build these from the enums?
 	private static final String VALID_SHOTS = "frvoulhjbszpymiktq";
-	private static final String SERVE_PATTERN_STRING = "^[0456]";
+	private static final String SERVE_PATTERN_STRING = "c*^[0456]";
 	private static final String RALLY_PATTERN_STRING = "[" + VALID_SHOTS + "][0123]?[0789]?";
-	private static final String ENDING_PATTERN_STRING = "([*e#@nwdx!]|[nwdx!e][#@])$";
+	private static final String ENDING_PATTERN_STRING = "([*e#@nwdxg!]|[nwdx!e][#@])$";
 	private static final Pattern ENDING_PATTERN = Pattern.compile(ENDING_PATTERN_STRING);
 	private static final Pattern SHOT_PATTERN = Pattern.compile("[" + VALID_SHOTS + "]");
 	private static final Pattern POINT_PATTERN = Pattern.compile("P|Q|R|S|" + SERVE_PATTERN_STRING 
@@ -53,9 +53,9 @@ public class Point {
         BACKHAND_HALFVOLLEY ('i'),
         BACKHAND_SWINGINGVOLLEY ('k'),
 		
-		STROKE_TRICK ('t'),
-		STROKE_UNKNOWN ('q'),
-		STROKE_LETCORE ('c'),
+		TRICK ('t'),
+		UNKNOWN ('q'),
+		LETCORD ('c'),
 		NO_STROKE (' ');
 
 		private char value;
@@ -143,10 +143,31 @@ public class Point {
 		public String toString() { return Character.toString(value); }
     }
 
+	/**
+	 * Copy constructor
+	 */
+	public Point(Point p) {
+		this(p.mFirstServe, p.mServer, p.toString());
+		this.seq = p.seq;
+		this.comments = p.comments;
+	}
+
+	/**
+	 * Create an empty point.
+	 * 
+	 * @param firstServe True if this point is a first serve
+	 * @param server 1 or 2, the player who is serving
+	 */
 	public Point(boolean firstServe, int server) {
 		this(firstServe, server, "");
 	}
 
+	/**
+	 * 
+	 * @param firstServe True if this point is a first serve
+	 * @param server 1 or 2, the player who is serving
+	 * @param point string representation of the point
+	 */
 	public Point(boolean firstServe, int server, String point) {
 		mFirstServe = firstServe;
 		mServer = server;
@@ -155,7 +176,6 @@ public class Point {
 
 	public void givePoint(Point.PointGiven pg) {
 		data = new StringBuilder().append(pg);
-		endPoint();
 	}
 
 	public void serve(Point.ServeDirection sd) {
@@ -164,22 +184,39 @@ public class Point {
 		}
 	}
 
+	/**
+	 * Adds a letchord. Will destroy any non-letchord strokes in the point.
+	 */
+	public void addLetchord() {
+		data = new StringBuilder(data.toString().replaceAll("[^c]", ""));
+		data.append(Stroke.LETCORD.asChar());
+	}
+
+	public void addStroke(Point.Stroke s) {
+		addStroke(s, null, null);
+	}
+
 	public void addStroke(Point.Stroke s, Point.Direction dir) {
 		addStroke(s, dir, null);
 	}
 
 	public void addStroke(Point.Stroke s, Point.Direction dir, Point.Depth d) {
-		if (s == null || dir == null) {
+		if (s == null) {
 			throw new InvalidParameterException();
 		}
 
+		reopenPoint();
 		data.append(s.asChar());
-		data.append(dir.asChar());
+		if (dir != null)
+			data.append(dir.asChar());
 		if (d != null)
 			data.append(d.asChar());
 	}
 	
-	public void endPoint() {
+	/**
+	 * Remove point end
+	 */
+	public void reopenPoint() {
 		endPoint(null, null);
 	}
 
@@ -192,6 +229,11 @@ public class Point {
 	}
 
 	public void endPoint(Point.PointOutcome o, Point.ErrorType et) {
+		// Remove any existing point end
+		Matcher m = ENDING_PATTERN.matcher(data);
+		while (m.find())
+			data.delete(m.start(), m.end());
+
 		if (o != null) {
 			data.append(o.asChar());
 			if (o != PointOutcome.WINNER && et != null)
@@ -236,10 +278,12 @@ public class Point {
 	}
 
 	public int shotCount() {
-		if (data.length() < 2)
+		// Remove letchords,  they mess up the count
+		String clean_data = data.toString().replace("c", "");
+		if (clean_data.length() < 1)
 			return 0;
 		else
-			return SHOT_PATTERN.split(data).length;
+			return SHOT_PATTERN.split(clean_data).length;
 	}
 
 	public int server() {
@@ -282,5 +326,4 @@ public class Point {
 	public int nextPlayer() {
 		return (shotCount() % 2) == 0 ? server() : returner();
 	}
-	
 }

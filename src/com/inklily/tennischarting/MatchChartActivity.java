@@ -7,6 +7,7 @@ import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException
 import com.inklily.tennischarting.Point.Direction;
 import com.inklily.tennischarting.Point.ServeDirection;
 import com.inklily.tennischarting.Point.Stroke;
+import com.inklily.tennischarting.PointEndDialog.OnPointEndListener;
 import com.inklily.tennischarting.util.SystemUiHider;
 
 import android.annotation.SuppressLint;
@@ -25,6 +26,7 @@ import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -47,7 +49,7 @@ import android.widget.TextView;
  * 
  * @author mrdog
  */
-public class MatchChartActivity extends Activity implements OnDismissListener, OnCancelListener {
+public class MatchChartActivity extends FragmentActivity implements OnPointEndListener {
 	/**
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
@@ -95,14 +97,17 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 	private GuideView shotGuide;
 	private ServeGuide serveGuide;
 	private LocationGuide locationGuide;
-	private PointEndMenu pointEndMenu;
+	private PointEndDialog pointEndDialog;
 	private View centerLegend;
 
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
 		public void run() {
 			disableInput = true;
-			pointEndMenu.show(currentPoint.shotCount() < 1);
+			pointEndDialog = new PointEndDialog();
+			pointEndDialog.setPoint(currentPoint);
+			pointEndDialog.show(getSupportFragmentManager(), "pointend");
+			mActiveGesture = false;
 		}
 		
 	};
@@ -149,8 +154,6 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 		shotGuide = (GuideView) findViewById(R.id.shot_guide);
 		locationGuide = (LocationGuide) findViewById(R.id.location_guide);
 		serveGuide = (ServeGuide) findViewById(R.id.serve_guide);
-		pointEndMenu = new PointEndMenu(this);
-		pointEndMenu.setOnDismissListener(this);
 
 		centerLegend = findViewById(R.id.center_legend);
 
@@ -272,6 +275,7 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 			if (current_state == State.STROKE) {
 				mGestureEnd.x = event.getX();
 				mGestureEnd.y = event.getY();
+				mGestureOverlay.invalidate();
 			}
 		} else {
 			return super.onTouchEvent(event);
@@ -287,9 +291,8 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putLong("match_id", match.id);
-		
 		super.onSaveInstanceState(outState);
+		outState.putLong("match_id", match.id);
 	}
 
 	/**
@@ -312,11 +315,11 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 		double distance = Math.sqrt(dX*dX + dY*dY);
 			
 		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
-			return Point.Stroke.STROKE_UNKNOWN;
+			return Point.Stroke.UNKNOWN;
 
 		double angle = Math.atan2(dY, dX);
 		if (angle > TRICK_ANGLE || angle < -TRICK_ANGLE)
-			return Point.Stroke.STROKE_TRICK;
+			return Point.Stroke.TRICK;
 		else if (angle > 0)
 			return Point.Stroke.FOREHAND_OVERHEAD;
 		else
@@ -343,7 +346,7 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 		if (angle > DROP_MIN)
 			return index.DROPSHOT;
 
-		return Point.Stroke.STROKE_UNKNOWN;
+		return Point.Stroke.UNKNOWN;
 	}
 
 	public Point.Stroke detectStroke() {
@@ -622,13 +625,18 @@ public class MatchChartActivity extends Activity implements OnDismissListener, O
 	}
 
 	@Override
-	public void onDismiss(DialogInterface dialog) {
+	public void onPointComplete(Point p) {
 		disableInput = false;
+		currentPoint = p;
+		savePoint();
 		this.current_state = State.SERVE;
+		updateUI();
 	}
 
 	@Override
-	public void onCancel(DialogInterface dialog) {
+	public void onPointContinue(Point p) {
 		disableInput = false;
+		if (p != null)
+			currentPoint = p;
 	}
 }
