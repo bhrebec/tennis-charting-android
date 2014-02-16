@@ -17,6 +17,7 @@ public interface MatchStorage extends ListAdapter {
 
     public void addOnStorageAvailableListener(OnStorageAvailableListener listener);
 	public void savePoint(Match m, Point p) throws MatchStorageNotAvailableException;
-	public void saveMatch(Match m) throws MatchStorageNotAvailableException; 
+	public void saveMatch(Match m) throws MatchStorageNotAvailableException;
+    public void deleteMatch(long id) throws MatchStorageNotAvailableException;
 	public Match retrieveMatch(long id)  throws MatchStorageNotAvailableException;
 }

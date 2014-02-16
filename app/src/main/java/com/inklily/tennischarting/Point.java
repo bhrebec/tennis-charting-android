@@ -10,7 +10,7 @@ public class Point {
 
 	private boolean mFirstServe;
 	private int mServer;
-	public String comments;
+	public String comments = "";
 	
 	// TODO: build these from the enums?
 	private static final String VALID_SHOTS = "frvoulhjbszpymiktq";

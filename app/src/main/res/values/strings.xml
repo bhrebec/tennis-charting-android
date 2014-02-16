@@ -76,5 +76,10 @@
     <string name="penalty_prompt">Penalty Against Who?</string>
     <string name="title_activity_match_end">MatchEndActivity</string>
     <string name="match_complete">Match Complete</string>
+    <string name="send_processing">Send for processing</string>
+    <string name="send_processing_sent">Send for processing (already sent)</string>
+    <string name="submit_email_address">jeffsackmann@gmail.com</string>
+    <string name="send_later">Send Later</string>
+    <string name="continue_match">Continue Match</string>
 
 </resources>

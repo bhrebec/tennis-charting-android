@@ -160,6 +160,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		vals.put("first_serve", p.isFirstServe());
 		vals.put("server", p.server());
 		vals.put("point", p.toString());
+        db.replace("point", null, vals);
 	}
 
 	@Override
@@ -192,7 +193,17 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		m.id = db.replace("match", null, vals);
 	}
 
-	public int getIncompleteMatchCount() throws MatchStorageNotAvailableException {
+    @Override
+    public void deleteMatch(long id) throws MatchStorageNotAvailableException {
+        if (db == null)
+            throw new MatchStorageNotAvailableException();
+
+        final String[] args = { Long.toString(id), };
+        db.delete("match", "_id = ? ", args);
+        db.delete("point", "match_id = ? ", args);
+    }
+
+    public int getIncompleteMatchCount() throws MatchStorageNotAvailableException {
 		if (db == null)
 			throw new MatchStorageNotAvailableException();
 		Cursor c = db.rawQuery("SELECT count(*) FROM match WHERE complete = 0", null);
@@ -204,6 +215,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private Match makeMatch(Cursor c) {
         Match m = new Match(c.getInt(12), c.getInt(13) == 1, c.getInt(16) == 1);
 
+        m.id = c.getLong(0);
         m.player1 = c.getString(1);
         m.player2 = c.getString(2);
         m.player1hand = c.getString(3).charAt(0);
@@ -231,7 +243,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 			return null;
 
         Match m = makeMatch(c);
-		
+        c.close();
+
  		final String[] point_cols = { "match_id", "first_serve", "server", "seq", "point" };
  		Cursor pc = db.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
@@ -239,6 +252,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
  			p.seq = pc.getInt(3);
  			m.addPoint(p);
  		}
+        pc.close();
  		 
         return m;
 	}

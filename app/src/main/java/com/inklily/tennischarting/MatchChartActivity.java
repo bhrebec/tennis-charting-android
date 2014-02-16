@@ -9,6 +9,7 @@ import com.inklily.tennischarting.util.SystemUiHider;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -40,7 +41,7 @@ import android.widget.TextView;
  * @author mrdog
  */
 public class MatchChartActivity extends FragmentActivity implements OnPointEndListener {
-	/**
+    /**
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
 	private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
@@ -199,7 +200,19 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			newPoint(false);
 		else
 			newPoint(true);
+
+        if (match.isComplete()) {
+            endMatch();
+        }
 	}
+
+    private void endMatch () {
+        Intent intent = new Intent(this, MatchDetailActivity.class);
+        intent.putExtra("match_id", match.id);
+        intent.putExtra("review", false);
+        startActivity(intent);
+    }
+
 	
 	private void updateUI() {
         updateHandedness();
@@ -400,6 +413,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             if (currentPoint.shotCount() > 0)
                 setState(State.STROKE);
         }
+    }
+
+    @Override
+    public void onMatchOver() {
+        savePoint();
+        endMatch();
     }
 
 	public class GestureOverlay extends View {

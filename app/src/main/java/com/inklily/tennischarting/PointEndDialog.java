@@ -65,6 +65,7 @@ public class PointEndDialog extends DialogFragment {
     public interface OnPointEndListener {
 		public void onPointComplete(Point p);
 		public void onPointContinue(Point p);
+        public void onMatchOver();
 	}
 	
 	// Kludge workaround for android RadioButton bug #4785
@@ -124,10 +125,9 @@ public class PointEndDialog extends DialogFragment {
                 getPlayerDialog(R.string.retired_prompt, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (which == mPoint.server())
-                            ;
-                        else
-                            ;
+                        mPoint.comments += mPlayers[which] + " retired";
+                        finishPoint();
+                        pointEndListener.onMatchOver();
                     }
                 });
             } else if (which == 2) { // Flip near court

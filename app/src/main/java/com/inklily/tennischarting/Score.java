@@ -29,6 +29,11 @@ public class Score {
 		mFinalTb = t;
 		reset_score();
 	}
+
+    public boolean isComplete() {
+        return mCurrentSet >= mSets;
+    }
+
 	
 	/**
 	 * Set the number of sets and recalculate the score.

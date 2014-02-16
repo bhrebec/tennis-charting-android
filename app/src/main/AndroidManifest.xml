@@ -28,6 +28,11 @@
             android:label="@string/match_information" >
         </activity>
         <activity
+            android:theme="@android:style/Theme.Black"
+            android:name="com.inklily.tennischarting.MatchDetailActivity"
+            android:label="@string/review_matches" >
+        </activity>
+        <activity
             android:name="com.inklily.tennischarting.MatchReviewActivity"
             android:label="@string/review_matches" >
         </activity>

@@ -1,6 +1,8 @@
 package com.inklily.tennischarting;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -28,7 +30,28 @@ public class MatchReviewActivity extends Activity implements MatchStorage.OnStor
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent it = new Intent(MatchReviewActivity.this, MatchDetailActivity.class);
+                it.putExtra("match_id", id);
                 startActivity(it);
+            }
+        });
+        match_list.setOnItemLongClickListener(new ListView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MatchReviewActivity.this);
+                builder.setMessage("Really delete this match?");
+                builder.setNegativeButton("Not yet", null);
+                builder.setPositiveButton("Do it", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            mStorage.deleteMatch(id);
+                        } catch (MatchStorage.MatchStorageNotAvailableException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                builder.show();
+                return false;
             }
         });
 

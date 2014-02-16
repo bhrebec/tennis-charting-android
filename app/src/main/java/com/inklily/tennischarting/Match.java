@@ -70,8 +70,7 @@ public class Match {
 	}
 
 	public boolean isComplete() {
-		// TODO: implement
-		return false; 
+		return current_score.isComplete();
 	}
 
 	public boolean rightHanded(int player) {
@@ -103,7 +102,7 @@ public class Match {
 	String outputRow(Point serve1, Point serve2) {
 		if (serve1 != null) {
 			// Output row
-			String comments = serve1.comments + serve2 == null ? "" : serve2.comments;
+			String comments = serve1.comments + (serve2 == null ? "" : serve2.comments);
 			return String.format(",,,,,,,,%s,%s,%s\n", serve1, serve2 == null ? "" : serve2, comments);
 		}
 		return "";
@@ -129,7 +128,7 @@ public class Match {
 		output.append(",").append(sets()).append('\n');
 		output.append(",").append(mFinalTb ? "1" : "0").append('\n');
 		output.append(",").append(mSets).append('\n');
-		output.append("\n\n");
+		output.append(",\n,\n");
 		Point serve1 = null;
 		Point serve2 = null;
 		for (Point p : points) {
