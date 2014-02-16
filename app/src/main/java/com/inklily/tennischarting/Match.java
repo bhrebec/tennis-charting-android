@@ -23,13 +23,14 @@ public class Match {
 	private int mSets;
 	private boolean mFinalTb;
 	public String charted_by;
-	
+    public boolean sent;
+
 	public boolean nearServerFirst; // true if first server is closest to the camera
 	
 	// Cache of the latest score
 	private Score current_score;
-	
-	public Match(int sets, boolean final_tb, boolean nearServerFirst) {
+
+    public Match(int sets, boolean final_tb, boolean nearServerFirst) {
 		this.nearServerFirst = nearServerFirst;
 		this.mSets = sets;
 		this.mFinalTb = final_tb;

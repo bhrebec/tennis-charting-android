@@ -1,6 +1,13 @@
 package com.inklily.tennischarting;
 
 import java.io.File;
+import java.sql.SQLClientInfoException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,15 +15,37 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
 
-public class SQLiteMatchStorage implements MatchStorage {
-	private final static String DATABASE_NAME = "matches";
+public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
+    private final static String DATABASE_NAME = "matches";
 	private final static int DB_VERSION_1 = 1;
-	private final static int CURRENT_DB_VERSION = DB_VERSION_1;
-	
-	private static SQLiteMatchStorage _instance = null;
+    private final static int DB_VERSION_2 = 2;
+    private final static int DB_VERSION_3 = 3;
+	private final static int CURRENT_DB_VERSION = DB_VERSION_3;
+    private final static SimpleDateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
+    private final static String[] MATCH_COLS = { "_id", "player1", "player2" , "player1hand" ,
+            "player2hand" ,	"date", "tournament", "round",
+            "time", "court", "surface",	"umpire",
+            "sets", "final_tb", "charted_by", "complete",
+            "near", "sent" };
+    private final Context context;
+
+    private MatchSQLHelper helper;
+    private SQLiteDatabase db;
+    private List<OnStorageAvailableListener> mAvailableListeners;
+    private CursorAdapter cursorAdapter;
+
+    private static SQLiteMatchStorage _instance = null;
 	public static SQLiteMatchStorage getGlobalInstance(Context cxt) {
 		if (_instance == null) {
 			_instance = new SQLiteMatchStorage(cxt.getApplicationContext());
@@ -45,17 +74,22 @@ public class SQLiteMatchStorage implements MatchStorage {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("CREATE TABLE match(id INTEGER, " +
+			db.execSQL("CREATE TABLE IF NOT EXISTS match(_id INTEGER, " +
 					"player1, player2 , player1hand , player2hand , " +
 					"date, tournament, round, time, court, surface, " +
 					"umpire, sets, final_tb, charted_by, complete, near, " +
-					"PRIMARY KEY (id))");
-			db.execSQL("CREATE TABLE point(match_id INTEGER, " +
+                    "sent DEFAULT (0), date_entered, " +
+					"PRIMARY KEY (_id))");
+			db.execSQL("CREATE TABLE IF NOT EXISTS point(match_id INTEGER, " +
                     "seq INTEGER, point TEXT, first_serve, server, UNIQUE(match_id, seq))");
 		}
 
 		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {			
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion == DB_VERSION_2) {
+                db.execSQL("DROP TABLE match");
+                onCreate(db);
+            }
 		}
 	}
 	
@@ -76,20 +110,33 @@ public class SQLiteMatchStorage implements MatchStorage {
 		}
 		
 	    protected void onPostExecute(SQLiteDatabase result) {
-	    	if (failure)
-	    		;
-	        db = result;
+	    	if (failure) {
+                // TODO: make a listener for this
+            } else {
+                db = result;
+                cursorAdapter = matchCursorAdapterFactory();
+                Log.d("SQLMatchStorage", "Storage Available");
+                for (OnStorageAvailableListener l : mAvailableListeners)
+                    l.onStorageAvailable(SQLiteMatchStorage.this);
+            }
 	    }
 	}
 
-	private MatchSQLHelper helper;
-	private SQLiteDatabase db;
-	
 	public SQLiteMatchStorage(Context cxt) {
+        mAvailableListeners = new ArrayList<OnStorageAvailableListener>();
 		helper = MatchSQLHelper.makeHelper(cxt);
-		//new DBOpenAsync().execute(helper);
-		db = helper.getWritableDatabase();
+		new DBOpenAsync().execute(helper);
+		// db = helper.getWritableDatabase();
+        context = cxt;
 	}
+
+    @Override
+    public void addOnStorageAvailableListener(OnStorageAvailableListener listener) {
+        if (db == null)
+            mAvailableListeners.add(listener);
+        else
+            listener.onStorageAvailable(this);
+    }
 
 	public void close() {
 		if (db != null)
@@ -136,9 +183,11 @@ public class SQLiteMatchStorage implements MatchStorage {
 		vals.put("charted_by", m.charted_by);
 		vals.put("complete", m.isComplete());
 		vals.put("near", m.nearServerFirst);
-		
+        vals.put("sent", m.sent);
+        vals.put("date_entered", DB_DATE_FORMAT.format(new Date()));
+
 		if (m.id != null)
-			vals.put("id", m.id);
+			vals.put("_id", m.id);
 		
 		m.id = db.replace("match", null, vals);
 	}
@@ -151,23 +200,10 @@ public class SQLiteMatchStorage implements MatchStorage {
 		c.moveToFirst();
 		return c.getInt(0);
 	}
-	
-	public Match retrieveMatch(long id) throws MatchStorageNotAvailableException {
-		if (db == null)
-			throw new MatchStorageNotAvailableException();
-		
-		final String[] cols = { "id", "player1", "player2" , "player1hand" , 
-			"player2hand" ,	"date", "tournament", "round", 
-			"time", "court", "surface",	"umpire", 
-			"sets", "final_tb", "charted_by", "complete", "near" };
-		final String[] args = { Long.toString(id), };
-		
-		Cursor c = db.query("match", cols, "id = ?", args, null, null, null);
-		if (!c.moveToFirst())
-			return null;
-		
-		Match m = new Match(c.getInt(12), c.getInt(13) == 1, c.getInt(16) == 1);
-		
+
+    private Match makeMatch(Cursor c) {
+        Match m = new Match(c.getInt(12), c.getInt(13) == 1, c.getInt(16) == 1);
+
         m.player1 = c.getString(1);
         m.player2 = c.getString(2);
         m.player1hand = c.getString(3).charAt(0);
@@ -180,7 +216,22 @@ public class SQLiteMatchStorage implements MatchStorage {
         m.surface = c.getString(10);
         m.umpire = c.getString(11);
         m.charted_by = c.getString(14);
-         
+        m.sent = c.getInt(17) != 0;
+        return m;
+    }
+	
+	public Match retrieveMatch(long id) throws MatchStorageNotAvailableException {
+		if (db == null)
+			throw new MatchStorageNotAvailableException();
+		
+		final String[] args = { Long.toString(id), };
+		
+		Cursor c = db.query("match", MATCH_COLS, "_id = ?", args, null, null, null);
+		if (!c.moveToFirst())
+			return null;
+
+        Match m = makeMatch(c);
+		
  		final String[] point_cols = { "match_id", "first_serve", "server", "seq", "point" };
  		Cursor pc = db.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
@@ -191,6 +242,65 @@ public class SQLiteMatchStorage implements MatchStorage {
  		 
         return m;
 	}
-	
-	
+
+    @Override
+    public int getCount() {
+        if (db == null)
+            return 0;
+
+        return cursorAdapter.getCount();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        if (db == null)
+            return null;
+
+        return cursorAdapter.getItem(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (db == null)
+            return 0;
+
+        return cursorAdapter.getItemId(position);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (db == null)
+            return null;
+
+        return cursorAdapter.getView(position, convertView, parent);
+    }
+
+    private MatchCursorAdapter matchCursorAdapterFactory () {
+        Cursor c = db.query("match", MATCH_COLS, null, null, null, null, "date_entered DESC");
+        return new MatchCursorAdapter(context, c);
+    }
+
+    private class MatchCursorAdapter extends CursorAdapter {
+        public MatchCursorAdapter(Context context, Cursor c) {
+            super(context, c, false);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            return inflater.inflate(R.layout.match_listitem, viewGroup, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView players = (TextView) view.findViewById(R.id.players);
+            TextView date = (TextView) view.findViewById(R.id.date);
+            players.setText(cursor.getString(1) + " v. " + cursor.getString(2));
+            if (cursor.getInt(17) == 1) // sent already
+                players.setTextColor(Color.GRAY);
+            else
+                players.setTextColor(Color.WHITE);
+            date.setText(cursor.getString(5));
+        }
+    }
 }

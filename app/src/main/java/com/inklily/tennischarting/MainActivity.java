@@ -14,7 +14,15 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
+        findViewById(R.id.btn_review_matches).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this, MatchReviewActivity.class);
+                startActivity(it);
+            }
+        });
+
 		findViewById(R.id.btn_chart_new_match).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

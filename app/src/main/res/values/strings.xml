@@ -75,5 +75,6 @@
     <string name="retired_prompt">Who Retired?</string>
     <string name="penalty_prompt">Penalty Against Who?</string>
     <string name="title_activity_match_end">MatchEndActivity</string>
+    <string name="match_complete">Match Complete</string>
 
 </resources>

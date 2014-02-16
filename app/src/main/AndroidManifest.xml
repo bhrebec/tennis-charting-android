@@ -28,8 +28,12 @@
             android:label="@string/match_information" >
         </activity>
         <activity
+            android:name="com.inklily.tennischarting.MatchReviewActivity"
+            android:label="@string/review_matches" >
+        </activity>
+        <activity
             android:name="com.inklily.tennischarting.MatchEndActivity"
-            android:label="@string/match_information" >
+            android:label="@string/match_complete" >
         </activity>
         <activity
             android:name="com.inklily.tennischarting.MatchChartActivity"
