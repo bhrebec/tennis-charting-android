@@ -201,11 +201,11 @@ public class Score {
         String p1_pts_str;
         String p2_pts_str;
         if (in_tb()) {
-            p1_pts_str = PTS_TABLE[p1_pts];
-            p2_pts_str = PTS_TABLE[p2_pts];
-        } else {
             p1_pts_str = Integer.toString(p1_pts);
             p2_pts_str = Integer.toString(p2_pts);
+        } else {
+            p1_pts_str = PTS_TABLE[p1_pts];
+            p2_pts_str = PTS_TABLE[p2_pts];
         }
 		if (server() == 0)
 			score.append(String.format(", %s-%s ", p1_pts_str, p2_pts_str));
