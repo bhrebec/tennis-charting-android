@@ -117,6 +117,7 @@ public class PointEndDialog extends DialogFragment {
                             mPoint.givePoint(Point.PointGiven.POINT_SERVER_PENALTY);
                         else
                             mPoint.givePoint(Point.PointGiven.POINT_RETURNER_PENALTY);
+                        finishPoint();
                     }
                 });
             } else if (which == 1) { // Retirement
@@ -281,7 +282,6 @@ public class PointEndDialog extends DialogFragment {
 				finishPoint();
 			}
 		});
-		mNextPoint.setVisibility(View.INVISIBLE);
 
 		// Letchord
 		mRootView.findViewById(R.id.point_letcord).setOnClickListener(new View.OnClickListener() {
@@ -361,6 +361,7 @@ public class PointEndDialog extends DialogFragment {
 			mPointEndGroup.clearCheck();
 		}
 		mErrors.setVisibility(View.INVISIBLE);
+        mNextPoint.setVisibility(View.INVISIBLE);
 
 		mPointEditor.setText(mPoint.toString());
 		mPointEditor.invalidate();

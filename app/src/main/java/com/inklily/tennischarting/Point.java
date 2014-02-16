@@ -324,6 +324,6 @@ public class Point {
 	}
 	
 	public int nextPlayer() {
-		return (shotCount() % 2) == 0 ? server() : returner();
+		return (shotCount() % 2) == 1 ? server() : returner();
 	}
 }

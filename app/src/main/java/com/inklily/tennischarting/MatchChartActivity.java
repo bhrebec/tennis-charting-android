@@ -166,9 +166,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		mSystemUiHider.setup();
 		mSystemUiHider.hide();
 
-		match = new Match(3, true, true);
-		match.player1hand = 'R';
-		match.player2hand = 'R';
 		newPoint(true);
 		
 		updateUI();
