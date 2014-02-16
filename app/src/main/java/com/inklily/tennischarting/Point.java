@@ -283,7 +283,7 @@ public class Point {
 		if (clean_data.length() < 1)
 			return 0;
 		else
-			return SHOT_PATTERN.split(clean_data).length;
+			return SHOT_PATTERN.split(clean_data + " ").length; // Add a trailing space to correct points ending with a stroke
 	}
 
 	public int server() {

@@ -1,6 +1,5 @@
 package com.inklily.tennischarting;
 
-import com.example.tennischarting.R;
 import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 
 import android.app.Activity;

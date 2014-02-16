@@ -8,6 +8,7 @@ import java.util.List;
  *
  */
 public class Score {
+    private final static String[] PTS_TABLE = {"0", "15", "30", "40"};
 	private int[] p1_games;
 	private int[] p1_tbs;
 	private int[] p2_games;
@@ -191,10 +192,20 @@ public class Score {
 				score.append(String.format("%s-%s ", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
 		}
 
+
+        String p1_pts_str;
+        String p2_pts_str;
+        if (in_tb()) {
+            p1_pts_str = PTS_TABLE[p1_pts];
+            p2_pts_str = PTS_TABLE[p2_pts];
+        } else {
+            p1_pts_str = Integer.toString(p1_pts);
+            p2_pts_str = Integer.toString(p2_pts);
+        }
 		if (server() == 0)
-			score.append(String.format("%s-%s ", p1_pts, p2_pts));
+			score.append(String.format(", %s-%s ", p1_pts_str, p2_pts_str));
 		else
-			score.append(String.format("%s-%s ", p2_pts, p1_pts));
+			score.append(String.format(", %s-%s ", p2_pts_str, p1_pts_str));
 		return score.toString();
 	}
 	
@@ -206,10 +217,11 @@ public class Score {
 	}
 
 	/**
-	 * Returns true if server is near to the camera.
+	 * Returns true if next receiver is near to the camera, assuming the
+     * first receiver was far from the camera.
 	 */
 	public boolean near() {
-		boolean near = (((games() + 1) / 2) % 2) == 0;
+		boolean near = (((games() + 1) / 2) % 2) == 1;
 		if (in_tb() && (((p1_pts + p2_pts) / 6) % 2 == 1))
 			return !near;
 		else

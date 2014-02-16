@@ -1,0 +1,108 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .gitignore
+* MatchChart 0.1.2.xlsx
+* ic_launcher-web.png
+* proguard-project.txt
+* tennis-charting-test-test/
+* tennis-charting-test-test/.classpath
+* tennis-charting-test-test/.project
+* tennis-charting-test-test/.settings/
+* tennis-charting-test-test/.settings/org.eclipse.jdt.core.prefs
+* tennis-charting-test-test/bin/
+* tennis-charting-test-test/bin/AndroidManifest.xml
+* tennis-charting-test-test/bin/classes.dex
+* tennis-charting-test-test/bin/classes/
+* tennis-charting-test-test/bin/classes/com/
+* tennis-charting-test-test/bin/classes/com/example/
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/BuildConfig.class
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/R$attr.class
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/R$drawable.class
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/R$string.class
+* tennis-charting-test-test/bin/classes/com/example/tennischarting/test/R.class
+* tennis-charting-test-test/bin/classes/com/inklily/
+* tennis-charting-test-test/bin/classes/com/inklily/tennischarting/
+* tennis-charting-test-test/bin/classes/com/inklily/tennischarting/test/
+* tennis-charting-test-test/bin/classes/com/inklily/tennischarting/test/PointTest.class
+* tennis-charting-test-test/bin/res/
+* tennis-charting-test-test/bin/res/crunch/
+* tennis-charting-test-test/bin/res/crunch/drawable-hdpi/
+* tennis-charting-test-test/bin/res/crunch/drawable-hdpi/ic_launcher.png
+* tennis-charting-test-test/bin/res/crunch/drawable-ldpi/
+* tennis-charting-test-test/bin/res/crunch/drawable-ldpi/ic_launcher.png
+* tennis-charting-test-test/bin/res/crunch/drawable-mdpi/
+* tennis-charting-test-test/bin/res/crunch/drawable-mdpi/ic_launcher.png
+* tennis-charting-test-test/bin/res/crunch/drawable-xhdpi/
+* tennis-charting-test-test/bin/res/crunch/drawable-xhdpi/ic_launcher.png
+* tennis-charting-test-test/bin/resources.ap_
+* tennis-charting-test-test/bin/tennis-charting-test.apk
+* tennis-charting-test-test/gen/
+* tennis-charting-test-test/gen/com/
+* tennis-charting-test-test/gen/com/example/
+* tennis-charting-test-test/gen/com/example/tennischarting/
+* tennis-charting-test-test/gen/com/example/tennischarting/test/
+* tennis-charting-test-test/gen/com/example/tennischarting/test/BuildConfig.java
+* tennis-charting-test-test/gen/com/example/tennischarting/test/R.java
+* tennis-charting-test-test/hs_err_pid12088.log
+* tennis-charting-test-test/hs_err_pid12110.log
+* tennis-charting-test-test/hs_err_pid12418.log
+* tennis-charting-test-test/hs_err_pid12436.log
+* tennis-charting-test-test/proguard-project.txt
+* tennis-charting-test-test/project.properties
+* ui mockup.png
+* ui mockup.svg
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:+
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app/src/main/AndroidManifest.xml
+* assets/ => app/src/main/assets/
+* res/ => app/src/main/res/
+* src/ => app/src/main/java/
+* tennis-charting-test-test/res/ => app/src/instrumentTest/res/
+* tennis-charting-test-test/src/ => app/src/instrumentTest/java/
+
+Old Build Tools:
+----------------
+The version of the build tools installed with your SDK is old. It
+should be at least version 19.0.1 to work well with the Gradle build
+system. To update it, open the Android SDK Manager, and install the
+highest available version of Tools > Android SDK Build-tools.
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

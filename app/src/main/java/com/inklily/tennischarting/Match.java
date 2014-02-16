@@ -84,7 +84,11 @@ public class Match {
 		points.add(p);
 		current_score.score_point(p);
 	}
-	
+
+    public void addPoint(Point p, MatchStorage storage) throws MatchStorage.MatchStorageNotAvailableException {
+        addPoint(p);
+        storage.savePoint(this, p);
+    }
 	public String score(int before) {
 		Score s = new Score(mSets, mFinalTb);
 		s.reScore(points.subList(0, before));

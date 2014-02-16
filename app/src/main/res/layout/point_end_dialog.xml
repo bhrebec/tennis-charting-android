@@ -78,11 +78,6 @@
                      android:text="@string/unknown_point"
                      android:checked="true" 
                      />
-
-                 <Button
-                     android:id="@+id/point_penalty_point"
-                     style="@style/PointEndOutcomeButton"
-                     android:text="@string/point_penalty" />
              </RadioGroup>
              <RadioGroup
                  android:id="@+id/serve_end_group"
@@ -107,19 +102,15 @@
                      android:checked="true" 
                      />
 				<Button
-                     android:id="@+id/point_unknown_serve"
-                     style="@style/PointEndOutcomeButton"
-                     android:text="@string/unknown_point"
-                     />
-				<Button
                      android:id="@+id/point_letcord"
                      style="@style/PointEndOutcomeButton"
                      android:text="@string/letchord"
                      />
                  <Button
-                     android:id="@+id/point_penalty_serve"
+                     android:id="@+id/point_unknown_serve"
                      style="@style/PointEndOutcomeButton"
-                     android:text="@string/point_penalty" />
+                     android:text="@string/unknown_point"
+                     />
              </RadioGroup>
          </FrameLayout>
 
@@ -188,6 +179,13 @@
              android:layout_weight="1"
              android:orientation="vertical" >
 
+             <TextView
+                 android:id="@+id/point_score"
+                 android:layout_weight="0"
+                 android:layout_height="30px"
+                 android:layout_width="match_parent"
+                 android:color="@color/white"
+                 tools:ignore="NestedWeights" />
              <Button
                  android:id="@+id/point_add_note"
                  style="@style/PointEndFinishButton"
@@ -197,10 +195,10 @@
                  tools:ignore="NestedWeights" />
 
              <Button
-                 android:id="@+id/point_retire"
+                 android:id="@+id/point_more"
                  style="@style/PointEndFinishButton"
                  android:layout_weight="1"
-                 android:text="@string/retirement" />
+                 android:text="@string/point_more" />
 
              <Button
                  android:id="@+id/point_continue_point"

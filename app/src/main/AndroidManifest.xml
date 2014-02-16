@@ -1,6 +1,7 @@
+<<<<<<< Original
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tennischarting"
+    package="com.inklily.tennischarting"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -28,7 +29,7 @@
             android:label="@string/match_information" >
         </activity>
         <activity
-            android:name="com.inklily.tennischarting.EndPointActivity"
+            android:name="com.inklily.tennischarting.MatchEndActivity"
             android:label="@string/match_information" >
         </activity>
         <activity
@@ -40,3 +41,16 @@
     </application>
 
 </manifest>
+
+=======
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <application>
+        <activity android:name="com.inklily.tennischarting.MatchEndActivity"
+            android:label="@string/title_activity_match_end"
+            >
+        </activity>
+    </application>
+
+</manifest>
+>>>>>>> Added

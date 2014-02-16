@@ -1,7 +1,5 @@
 package com.inklily.tennischarting;
 
-import com.example.tennischarting.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,7 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +22,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 
 
 public class PointEndDialog extends DialogFragment {
@@ -41,9 +40,29 @@ public class PointEndDialog extends DialogFragment {
 	private ViewGroup mRootView;
 	private Point mPoint;
 	private boolean mServe;
-	private String[] mPlayers;
-	
-	public interface OnPointEndListener {
+	private String[] mPlayers = new String[2];
+    private Match mMatch;
+    private TextView mScore;
+
+
+    View.OnClickListener mUnknownListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            getPlayerDialog("Who won the point?", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == mPoint.server()) {
+                        mPoint.givePoint(Point.PointGiven.POINT_SERVER);
+                    } else {
+                        mPoint.givePoint(Point.PointGiven.POINT_RETURNER);
+                    }
+                    finishPoint();
+                }
+            });
+        }
+    };
+
+    public interface OnPointEndListener {
 		public void onPointComplete(Point p);
 		public void onPointContinue(Point p);
 	}
@@ -71,17 +90,6 @@ public class PointEndDialog extends DialogFragment {
 	private ViewGroup mErrors;
 	OnPointEndListener pointEndListener;
 
-	private OnClickListener mRetirementListener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			getPlayerDialog("Who retired?", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-				}
-			});
-		}
-	};
-	
 	private OnClickListener mAddNoteListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -95,8 +103,56 @@ public class PointEndDialog extends DialogFragment {
 			}).show(getActivity().getSupportFragmentManager(), "player_dialog");
 		}
 	};
-	
+
+
+    // "More... " dialog actions
+    private DialogInterface.OnClickListener mMoreDialogListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == 0) { // Point Penalty
+                getPlayerDialog(R.string.penalty_prompt, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == mPoint.server())
+                            mPoint.givePoint(Point.PointGiven.POINT_SERVER_PENALTY);
+                        else
+                            mPoint.givePoint(Point.PointGiven.POINT_RETURNER_PENALTY);
+                    }
+                });
+            } else if (which == 1) { // Retirement
+                getPlayerDialog(R.string.retired_prompt, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == mPoint.server())
+                            ;
+                        else
+                            ;
+                    }
+                });
+            } else if (which == 2) { // Flip near court
+                mMatch.nearServerFirst = !mMatch.nearServerFirst;
+            }
+        }
+    };
+
+    private OnClickListener mMoreListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            (new DialogFragment() {
+                @Override
+                public Dialog onCreateDialog(Bundle savedInstanceState) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("More Options...");
+                    final String[] items = { "Point Penalty", "Retirement", "Flip Near Court"};
+                    builder.setItems(items, mMoreDialogListener);
+                    return builder.create();
+                }
+            }).show(getActivity().getSupportFragmentManager(), "more_dialog");
+        }
+    };
+
 	private static SparseArray<Point.PointOutcome> pointOutcomeMap = new SparseArray<Point.PointOutcome>();
+
 	{
 		pointOutcomeMap.put(R.id.point_ace, Point.PointOutcome.ACE);
 		pointOutcomeMap.put(R.id.point_winner, Point.PointOutcome.WINNER);
@@ -109,7 +165,11 @@ public class PointEndDialog extends DialogFragment {
 		pointOutcomeMap.put(R.id.point_error_wide_deep, Point.PointOutcome.WIDE_DEEP);
 		pointOutcomeMap.put(R.id.point_error_foot_fault, Point.PointOutcome.FOOT_FAULT);
 	}
-	
+
+    private void getPlayerDialog(int prompt, final DialogInterface.OnClickListener listener) {
+        getPlayerDialog(getResources().getString(prompt), listener);
+    }
+
 	private void getPlayerDialog(final String prompt, final DialogInterface.OnClickListener listener) {
 		(new DialogFragment() {
 			@Override
@@ -211,6 +271,8 @@ public class PointEndDialog extends DialogFragment {
 				continuePoint();
 			}
 		});
+        mRootView.findViewById(R.id.point_unknown_point).setOnClickListener(mUnknownListener);
+        mRootView.findViewById(R.id.point_unknown_serve).setOnClickListener(mUnknownListener);
 
 		mNextPoint = (Button) mRootView.findViewById(R.id.point_next_point);
 		mNextPoint.setOnClickListener(new View.OnClickListener() {
@@ -220,18 +282,17 @@ public class PointEndDialog extends DialogFragment {
 			}
 		});
 		mNextPoint.setVisibility(View.INVISIBLE);
-		
-		// Letchord
-		((Button) mRootView.findViewById(R.id.point_letcord)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mPoint.addLetchord();
-				continuePoint();
-			}
-		});
 
-		mRetire = (Button) mRootView.findViewById(R.id.point_retire);
-		mRetire.setOnClickListener(mRetirementListener);
+		// Letchord
+		mRootView.findViewById(R.id.point_letcord).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPoint.addLetchord();
+                continuePoint();
+            }
+        });
+
+		mRootView.findViewById(R.id.point_more).setOnClickListener(mMoreListener);
 		mEditPoint = (Button) mRootView.findViewById(R.id.edit_point_btn);
 		mEditPoint.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -249,6 +310,7 @@ public class PointEndDialog extends DialogFragment {
 		mPointEditor.setSingleLine();
 
 		mFootFault = (RadioButton) mRootView.findViewById(R.id.point_error_foot_fault);
+        mScore = (TextView) mRootView.findViewById(R.id.point_score);
 
 		setup();
 		
@@ -278,7 +340,7 @@ public class PointEndDialog extends DialogFragment {
 		if (mRootView == null)
 			return;
 
-		if (mPoint.shotCount() < 2) {
+		if (mPoint.shotCount() <= 1) {
 			mServe = true;
 			mServeEndGroup.setVisibility(View.VISIBLE);
 			mPointEndGroup.setVisibility(View.GONE);
@@ -302,6 +364,7 @@ public class PointEndDialog extends DialogFragment {
 
 		mPointEditor.setText(mPoint.toString());
 		mPointEditor.invalidate();
+        mScore.setText(mMatch.score());
 	}
 	
 	@Override
@@ -324,8 +387,17 @@ public class PointEndDialog extends DialogFragment {
 		pointEndListener.onPointContinue(null);
 	}
 
-	public void setPoint(Point p) {
+	public void show(Match m, Point p, FragmentManager manager, String tag) {
+        show(manager, tag);
 		mPoint = new Point(p);
+        mMatch = m;
+        if (mPoint.server() == 1) {
+            mPlayers[0] = m.player1 + " " + "(server)";
+            mPlayers[1] = m.player2 + " " + "(returner)";
+        } else {
+            mPlayers[0] = m.player1 + " " + "(returner)";
+            mPlayers[1] = m.player2 + " " + "(server)";
+        }
 	}
 	
 	public Point point() {

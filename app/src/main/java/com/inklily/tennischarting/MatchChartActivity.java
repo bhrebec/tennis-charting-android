@@ -1,8 +1,5 @@
 package com.inklily.tennischarting;
 
-import java.util.Timer;
-
-import com.example.tennischarting.R;
 import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 import com.inklily.tennischarting.Point.Direction;
 import com.inklily.tennischarting.Point.ServeDirection;
@@ -11,12 +8,7 @@ import com.inklily.tennischarting.PointEndDialog.OnPointEndListener;
 import com.inklily.tennischarting.util.SystemUiHider;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -32,8 +24,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -78,18 +68,13 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	private PointF mGestureEnd = new PointF();
 	private boolean mActiveGesture = false;
 	private boolean nextStrokeRightHanded = true;
+    private boolean nextLocRightHanded = true;
 	private boolean nextStrokeNear = true;
 	private boolean disableInput;
 	
 	private Match match;
 	private Point currentPoint;
-	private boolean nextNear;
-	private boolean locRighthanded;
-	private boolean strokeRighthanded;
-	
-	/**
-	 * The instance of the {@link SystemUiHider} for this activity.
-	 */
+
 	private SystemUiHider mSystemUiHider;
 
 	private GestureOverlay mGestureOverlay;
@@ -97,25 +82,34 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	private GuideView shotGuide;
 	private ServeGuide serveGuide;
 	private LocationGuide locationGuide;
-	private PointEndDialog pointEndDialog;
 	private View centerLegend;
+
+    private Stroke currentStroke;
+    private SQLiteMatchStorage matchStorage;
+    private Handler handler;
 
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
 		public void run() {
+            Point p;
+
+            // Add a partial point if necessary
+            if (current_state == State.LOCATION) {
+                p = new Point(currentPoint);
+                p.addStroke(currentStroke);
+            } else {
+                p = currentPoint;
+            }
 			disableInput = true;
-			pointEndDialog = new PointEndDialog();
-			pointEndDialog.setPoint(currentPoint);
-			pointEndDialog.show(getSupportFragmentManager(), "pointend");
+
+            // TODO: DI this class for testing
+            PointEndDialog pointEndDialog = new PointEndDialog();
+			pointEndDialog.show(match, p, getSupportFragmentManager(), "point_end");
 			mActiveGesture = false;
 		}
 		
 	};
 	
-	private Stroke currentStroke;
-	private SQLiteMatchStorage matchStorage;
-	private Handler handler;
-
 	@SuppressLint("InlinedApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +123,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			savedInstanceState.getLong("match_id");
 		} else {
 			Bundle extras = this.getIntent().getExtras();
-			if (extras.containsKey("match_id")) {
+			if (extras != null && extras.containsKey("match_id")) {
 				m_id = extras.getLong("match_id");
 			}
 		}
@@ -147,7 +141,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		} else {
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
-
 		setContentView(R.layout.activity_match_chart);
 
 		final View contentView = findViewById(R.id.fullscreen_content);
@@ -183,46 +176,68 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	
 	private void newPoint(boolean firstServe) {
 		currentPoint = new Point(firstServe, match.server());
-		nextNear = match.near();
-		updateHandedness();
 	}
 
 	private void updateHandedness() {
 		int n = currentPoint.nextPlayer();
-		locRighthanded = match.rightHanded(n);
-		strokeRighthanded = match.rightHanded((n % 2) + 1);
+
+        // Handedness of the next shot returner
+		nextLocRightHanded = match.rightHanded(n);
+        // Handedness of the next shot striker
+		nextStrokeRightHanded = match.rightHanded(n % 2 + 1);
+
+        // Is the next stroke near to the camera?
+        nextStrokeNear = match.near() ^ (currentPoint.shotCount() % 2 == 0);
 	}
 
 	private void savePoint() {
-		match.addPoint(currentPoint);
-		if (currentPoint.isFault())
+        try {
+            match.addPoint(currentPoint, matchStorage);
+        } catch (MatchStorageNotAvailableException e) {
+            // TODO: notify the user
+            e.printStackTrace();
+        }
+
+        if (currentPoint.isFault())
 			newPoint(false);
 		else
 			newPoint(true);
 	}
 	
-	public void updateUI() {
+	private void updateUI() {
+        updateHandedness();
+
 		serveGuide.setVisibility(View.INVISIBLE);
 		locationGuide.setVisibility(View.INVISIBLE);
 		shotGuide.setVisibility(View.INVISIBLE);
 
+        boolean deuce = match.deuceCourt();
+        Log.d("updateUI", String.format("%s %s %s",
+                nextStrokeNear ? "Near" : "Far",
+                nextStrokeRightHanded ? "Right" : "Left",
+                deuce ? "Deuce" : "Ad"));
 		switch (current_state) {
 		case SERVE:
 			serveGuide.setVisibility(View.VISIBLE);
-			serveGuide.setCourt(!nextNear, match.deuceCourt(), false);
+			serveGuide.setCourt(nextStrokeNear, deuce, false);
 			break;
 		case STROKE:
 			shotGuide.setVisibility(View.VISIBLE);
-			shotGuide.setCourt(!nextNear, false, strokeRighthanded);
+			shotGuide.setCourt(!nextStrokeNear, false, nextStrokeRightHanded);
 			break;
 		case LOCATION:
 			locationGuide.setVisibility(View.VISIBLE);
-			locationGuide.setCourt(nextNear, false, locRighthanded);
+			locationGuide.setCourt(nextStrokeNear, false, nextLocRightHanded);
 			break;
 		}
 	}
+
+    private void setState(State s) {
+        current_state = s;
+        updateUI();
+    }
 	
-	public void nextState() {
+	private void nextState() {
 		switch (current_state) {
 		case SERVE:
 			current_state = State.STROKE;
@@ -292,17 +307,18 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putLong("match_id", match.id);
+        if (match != null && match.id != null)
+            outState.putLong("match_id", match.id);
 	}
 
 	/**
 	 * Records the stroke based on the current gesture.
-	 * @param direction 
+	 * @param direction direction of the stroke
 	 */
-	public boolean recordStroke(Direction direction) {
+	private boolean recordStroke(Direction direction) {
 
 		updateHandedness();
-		nextNear = !nextNear;
+		nextStrokeNear = !nextStrokeNear;
 
 		currentPoint.addStroke(currentStroke, direction);
 
@@ -311,7 +327,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		return true;
 	}
 
-	public Point.Stroke detectCenterStroke(float dX, float dY) {
+	private Point.Stroke detectCenterStroke(float dX, float dY) {
 		double distance = Math.sqrt(dX*dX + dY*dY);
 			
 		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
@@ -326,7 +342,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			return Point.Stroke.BACKHAND_OVERHEAD;
 	}
 
-	public Point.Stroke detectStroke(Point.StrokeIndex index, float dX, float dY) {
+	private Point.Stroke detectStroke(Point.StrokeIndex index, float dX, float dY) {
 		double distance = Math.sqrt(dX*dX + dY*dY);
 			
 		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
@@ -349,25 +365,46 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		return Point.Stroke.UNKNOWN;
 	}
 
-	public Point.Stroke detectStroke() {
+	private Point.Stroke detectStroke() {
 		float dX = mGestureStart.x  - mGestureEnd.x;
 		float dY = mGestureStart.y  - mGestureEnd.y;
 		boolean left = mGestureStart.x < centerLegend.getLeft();
 		boolean right = mGestureStart.x > centerLegend.getRight();
-		boolean rightForehand = (nextStrokeRightHanded && nextStrokeNear) || (nextStrokeRightHanded && !nextStrokeNear);
+		boolean rightForehand = nextStrokeRightHanded != nextStrokeNear;
 		
 		if (!right)
 			dX = -dX;
 
+        // Find the stroke type
 		if ((right && rightForehand) || (left && !rightForehand)) {
 			return detectStroke(Point.FOREHAND_STROKES, dX, dY);
-		} else if ((left && rightForehand) || (right && !rightForehand)) {
+		} else if (left || right) {
 			return detectStroke(Point.BACKHAND_STROKES, dX, dY);
 		} else {
 			return detectCenterStroke(dX, dY);
 		}
 	}
-	
+
+    @Override
+    public void onPointComplete(Point p) {
+        disableInput = false;
+        currentPoint = p;
+        savePoint();
+        this.current_state = State.SERVE;
+        updateUI();
+    }
+
+    @Override
+    public void onPointContinue(Point p) {
+        disableInput = false;
+        if (p != null) {
+            currentPoint = p;
+            // If this is not a serve, reset to stroke selection
+            if (currentPoint.shotCount() > 0)
+                setState(State.STROKE);
+        }
+    }
+
 	public class GestureOverlay extends View {
 		Paint mPaint = new Paint();
 
@@ -393,7 +430,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		final int GUIDE_COLOR = Color.rgb(220, 220, 220);
 		protected boolean nearCourt = true;
 		protected boolean deuceCourt = true;
-		protected boolean righthanded = true;
+		protected boolean rightHanded = true;
 		protected Paint mLinePaint = new Paint();
 		protected Paint mGuidePaint = new Paint();
 
@@ -411,12 +448,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 
 		public void setCourt(boolean near, boolean deuce, boolean righthand) {
-			if (nearCourt != near || deuceCourt != deuce || righthand != righthanded)
+			if (nearCourt != near || deuceCourt != deuce || righthand != rightHanded)
 				this.invalidate();
 
 			nearCourt = near;
 			deuceCourt = deuce;
-			righthanded = righthand;
+			rightHanded = righthand;
 		}
 
 		protected void drawGuides(Canvas canvas) {
@@ -430,6 +467,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			canvas.drawLine(g2x, 0.0f, g2x, h, mGuidePaint);
 		}
 	}
+
 	public static class ServeGuide extends GuideView {
 		final float SERVICE_LINE_INSET = 50.0f;
 		final float T_LINE_INSET = 40.0f;
@@ -481,7 +519,8 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
 		}
 
-		@Override
+		@SuppressWarnings("ConstantConditions")
+        @Override
 		protected void onDraw(Canvas canvas) {
 			super.onDraw(canvas);
 			float h = (float)this.getHeight();
@@ -528,11 +567,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				shot_r = ((TextView) this.findViewById(R.id.shot_right_loc));
 			
 			if ((near && righthand) || (!near && !righthand)) {
-				shot_l.setText(R.string.backhand);
-				shot_r.setText(R.string.forehand);
+				shot_l.setText(R.string.backhand_side);
+				shot_r.setText(R.string.forehand_side);
 			} else {
-				shot_l.setText(R.string.forehand);
-				shot_r.setText(R.string.backhand);
+				shot_l.setText(R.string.forehand_side);
+				shot_r.setText(R.string.backhand_side);
 			}
 		}
 
@@ -614,7 +653,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			if (left_hand == null)
 				left_hand = ((TextView) this.findViewById(R.id.left_hand));
 			
-			if ((near && righthanded) || (!near && !righthand)) {
+			if ((near && rightHanded) || (!near && !righthand)) {
 				left_hand.setText(R.string.backhand);
 				right_hand.setText(R.string.forehand);
 			} else {
@@ -624,19 +663,4 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 	}
 
-	@Override
-	public void onPointComplete(Point p) {
-		disableInput = false;
-		currentPoint = p;
-		savePoint();
-		this.current_state = State.SERVE;
-		updateUI();
-	}
-
-	@Override
-	public void onPointContinue(Point p) {
-		disableInput = false;
-		if (p != null)
-			currentPoint = p;
-	}
 }
