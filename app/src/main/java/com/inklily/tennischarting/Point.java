@@ -34,6 +34,24 @@ public class Point {
 		public String toString() { return Character.toString(value); }
 	}
 
+    public enum Approach {
+        SERVE_AND_VOLLEY('+'),
+        NET_APPROACH('+');
+
+        private char value;
+        private Approach(char v) { value = v; }
+        public char asChar() { return value; }
+        public String toString() { return Character.toString(value); }
+    }
+	public enum NetPosition {
+		AT_NET('-'),
+		AT_BASELINE('=');
+
+		private char value;
+		private NetPosition(char v) { value = v; }
+		public char asChar() { return value; }
+		public String toString() { return Character.toString(value); }
+	}
 	public enum Stroke {
 		FOREHAND_GROUNDSTROKE('f'),
 		FOREHAND_SLICE ('r'),
@@ -101,7 +119,7 @@ public class Point {
 		}
 	};
 
-	public enum Direction {
+    public enum Direction {
         DEUCE ('1'), MIDDLE ('2'), AD ('3'), UNKNOWN ('0');
 		private char value;
 		private Direction(char v) { value = v; }
@@ -175,11 +193,18 @@ public class Point {
 		data = new StringBuilder().append(pg);
 	}
 
-	public void serve(Point.ServeDirection sd) {
-		if (sd != null) {
-			data.append(sd.asChar());
-		}
-	}
+    public void serve(Point.ServeDirection sd) {
+        serve(sd, null);
+    }
+
+    public void serve(Point.ServeDirection sd, Approach np) {
+        if (sd != null) {
+            data.append(sd.asChar());
+            if (np != null) {
+                data.append(np.asChar());
+            }
+        }
+    }
 
 	/**
 	 * Adds a letchord. Will destroy any non-letchord strokes in the point.
@@ -190,14 +215,22 @@ public class Point {
 	}
 
 	public void addStroke(Point.Stroke s) {
-		addStroke(s, null, null);
+		addStroke(s, null, null, null, null);
 	}
 
-	public void addStroke(Point.Stroke s, Point.Direction dir) {
-		addStroke(s, dir, null);
-	}
+    public void addStroke(Point.Stroke s, Point.Direction dir) {
+        addStroke(s, dir, null, null, null);
+    }
 
-	public void addStroke(Point.Stroke s, Point.Direction dir, Point.Depth d) {
+    public void addStroke(Point.Stroke s, Point.Direction dir, Point.Depth d) {
+        addStroke(s, dir, d, null, null);
+    }
+
+    public void addStroke(Point.Stroke s, Point.Direction dir, Point.Depth d, Approach approach) {
+        addStroke(s, dir, d, approach, null);
+    }
+
+	public void addStroke(Point.Stroke s, Point.Direction dir, Point.Depth d, Approach approach, NetPosition np) {
 		if (s == null) {
 			throw new InvalidParameterException();
 		}
@@ -206,6 +239,10 @@ public class Point {
 		data.append(s.asChar());
 		if (dir != null)
 			data.append(dir.asChar());
+        if (approach != null)
+            data.append(approach.asChar());
+        if (np != null)
+            data.append(np.asChar());
 		if (d != null)
 			data.append(d.asChar());
 	}

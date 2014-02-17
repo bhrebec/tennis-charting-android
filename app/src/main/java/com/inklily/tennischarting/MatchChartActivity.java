@@ -25,6 +25,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -56,7 +57,10 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	private static final double DROP_MIN = Math.toRadians(-135.0);
 
 	private static final double TRICK_ANGLE = Math.toRadians(135.0);
-	
+
+    private static final double NET_APPROACH_MIN = Math.toRadians(45.0);
+    private static final double NET_APPROACH_MAX = Math.toRadians(135.0);
+
 	private enum State {
 		SERVE,
 		LOCATION,
@@ -141,7 +145,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 		setContentView(R.layout.activity_match_chart);
 
-		final View contentView = findViewById(R.id.fullscreen_content);
+		final ViewGroup contentView = (ViewGroup) findViewById(R.id.fullscreen_content);
 		shotGuide = (GuideView) findViewById(R.id.shot_guide);
 		locationGuide = (LocationGuide) findViewById(R.id.location_guide);
 		serveGuide = (ServeGuide) findViewById(R.id.serve_guide);
@@ -155,7 +159,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 		mGestureOverlay = new GestureOverlay(this);
-		shotGuide.addView(mGestureOverlay, params);
+		contentView.addView(mGestureOverlay, params);
 
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
@@ -246,44 +250,40 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			return false;
 
 		if (action == MotionEvent.ACTION_DOWN) {
-			handler.postDelayed(mLongPressRunnable, 1000);
-			if (current_state == State.STROKE) {
-				mGestureEnd.x = mGestureStart.x = event.getX();
-				mGestureEnd.y = mGestureStart.y = event.getY();
-				mActiveGesture = true;
-			}
+            mActiveGesture = true;
+            mGestureEnd.x = mGestureStart.x = event.getX();
+            mGestureEnd.y = mGestureStart.y = event.getY();
+            handler.postDelayed(mLongPressRunnable, 1000);
 		} else if (action == MotionEvent.ACTION_UP) {
 			handler.removeCallbacks(mLongPressRunnable);
+            mGestureEnd.x = event.getX();
+            mGestureEnd.y = event.getY();
 			switch (current_state) {
 			case LOCATION:
 				recordStroke(locationGuide.getDirection(event.getX()));
 				break;
 			case STROKE:
-				mGestureEnd.x = event.getX();
-				mGestureEnd.y = event.getY();
-				mActiveGesture = false;
 				currentStroke = detectStroke();
 				break;
 			case SERVE:
-				currentPoint.serve(serveGuide.getServeDirection(event.getX()));
+                recordServe(serveGuide.getServeDirection(event.getX()));
 				break;
 			default:
 				break;
 			}
+            mActiveGesture = false;
 			nextState();
 		} else if (action == MotionEvent.ACTION_MOVE) {
-			if (current_state == State.STROKE) {
-				mGestureEnd.x = event.getX();
-				mGestureEnd.y = event.getY();
-				mGestureOverlay.invalidate();
-			}
+            mGestureEnd.x = event.getX();
+            mGestureEnd.y = event.getY();
+            mGestureOverlay.invalidate();
 		} else {
 			return super.onTouchEvent(event);
 		}
 		return false;
 	}
-	
-	@Override
+
+    @Override
 	protected void onPause() {
 		super.onPause();
 		handler.removeCallbacks(mLongPressRunnable);
@@ -308,13 +308,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		return true;
 	}
 
-	private Point.Stroke detectCenterStroke(float dX, float dY) {
-		double distance = Math.sqrt(dX*dX + dY*dY);
-			
+	private Point.Stroke detectCenterStroke(double distance, double angle) {
+
 		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
 			return Point.Stroke.UNKNOWN;
 
-		double angle = Math.atan2(dY, dX);
 		if (angle > TRICK_ANGLE || angle < -TRICK_ANGLE)
 			return Point.Stroke.TRICK;
 		else if (angle > 0)
@@ -323,13 +321,18 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			return Point.Stroke.BACKHAND_OVERHEAD;
 	}
 
-	private Point.Stroke detectStroke(Point.StrokeIndex index, float dX, float dY) {
-		double distance = Math.sqrt(dX*dX + dY*dY);
-			
+    private static double distance(float dX, float dY) {
+        return Math.sqrt(dX*dX + dY*dY);
+    }
+
+    private static double angle(float dX, float dY) {
+        return Math.atan2(dY, dX);
+    }
+
+	private Point.Stroke detectStroke(Point.StrokeIndex index, double distance, double angle) {
 		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
 			return index.GROUNDSTROKE;
 		
-		double angle = Math.atan2(dY, dX);
 		if (angle > LOB_MAX || angle < DROP_MIN)
 			return index.SLICE;
 		if (angle > SWINGING_VOLLEY_MAX)
@@ -358,13 +361,30 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
         // Find the stroke type
 		if ((right && rightForehand) || (left && !rightForehand)) {
-			return detectStroke(Point.FOREHAND_STROKES, dX, dY);
+			return detectStroke(Point.FOREHAND_STROKES, distance(dX, dY), angle(dX, dY));
 		} else if (left || right) {
-			return detectStroke(Point.BACKHAND_STROKES, dX, dY);
+			return detectStroke(Point.BACKHAND_STROKES, distance(dX, dY), angle(dX, dY));
 		} else {
 			return detectCenterStroke(dX, dY);
 		}
 	}
+
+    private void recordServe(Point.ServeDirection dir) {
+        float dX = mGestureStart.x  - mGestureEnd.x;
+        float dY = mGestureStart.y  - mGestureEnd.y;
+
+        if (distance(dX, dY) > TAP_MAX_DIST) {
+            double angle = angle(dX, dY);
+            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
+                currentPoint.serve(dir, Point.Approach.SERVE_AND_VOLLEY);
+            } else {
+                currentPoint.serve(ServeDirection.UNKNOWN);
+            }
+        } else {
+            currentPoint.serve(dir);
+        }
+    }
+
 
     @Override
     public void onPointComplete(Point p) {
