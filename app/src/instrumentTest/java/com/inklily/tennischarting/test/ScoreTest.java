@@ -91,7 +91,7 @@ public class ScoreTest extends TestCase {
         addPointsForPlayer(score3, 1, 1);
         assertEquals("0-0:15-0", score3.toString());
 
-        addPointsForPlayer(score3, 1, 1);
+        addPointsFor(score3, 1, Point.PointGiven.POINT_SERVER);
         assertEquals("0-0:30-0", score3.toString());
 
         addPointsForPlayer(score3, 1, 2);

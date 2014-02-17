@@ -41,7 +41,10 @@ public class Match {
 	public boolean finalTb() {
 		return mFinalTb;
 	}
-	
+
+    /**
+     * @return true if next return stroke will be near the camera
+     */
 	public boolean near() {
 		return current_score.near() ^ (!nearServerFirst);
 	}
@@ -89,7 +92,7 @@ public class Match {
         addPoint(p);
         storage.savePoint(this, p);
     }
-	public String score(int before) {
+	public String getScoreBefore(int before) {
 		Score s = new Score(mSets, mFinalTb);
 		s.reScore(points.subList(0, before));
 		return s.toString();
@@ -98,8 +101,12 @@ public class Match {
 	public String score() {
 		return current_score.toString();
 	}
-	
-	String outputRow(Point serve1, Point serve2) {
+
+    public void rescore() {
+        current_score.reScore(points);
+    }
+
+    String outputRow(Point serve1, Point serve2) {
 		if (serve1 != null) {
 			// Output row
 			String comments = serve1.comments + (serve2 == null ? "" : serve2.comments);

@@ -12,6 +12,7 @@ import java.util.Locale;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -44,6 +45,13 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private SQLiteDatabase db;
     private List<OnStorageAvailableListener> mAvailableListeners;
     private CursorAdapter cursorAdapter;
+
+    private DataSetObserver cursorObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            SQLiteMatchStorage.this.notifyDataSetInvalidated();
+        }
+    };
 
     private static SQLiteMatchStorage _instance = null;
 	public static SQLiteMatchStorage getGlobalInstance(Context cxt) {
@@ -115,6 +123,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
             } else {
                 db = result;
                 cursorAdapter = matchCursorAdapterFactory();
+                cursorAdapter.registerDataSetObserver(cursorObserver);
                 Log.d("SQLMatchStorage", "Storage Available");
                 for (OnStorageAvailableListener l : mAvailableListeners)
                     l.onStorageAvailable(SQLiteMatchStorage.this);
@@ -161,6 +170,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		vals.put("server", p.server());
 		vals.put("point", p.toString());
         db.replace("point", null, vals);
+
+        requeryAdapter();
 	}
 
 	@Override
@@ -191,6 +202,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 			vals.put("_id", m.id);
 		
 		m.id = db.replace("match", null, vals);
+        cursorAdapter.notifyDataSetChanged();
 	}
 
     @Override
@@ -201,6 +213,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         final String[] args = { Long.toString(id), };
         db.delete("match", "_id = ? ", args);
         db.delete("point", "match_id = ? ", args);
+
+        requeryAdapter();
     }
 
     public int getIncompleteMatchCount() throws MatchStorageNotAvailableException {
@@ -289,9 +303,16 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         return cursorAdapter.getView(position, convertView, parent);
     }
 
+    private Cursor query () {
+        return db.query("match", MATCH_COLS, null, null, null, null, "date_entered DESC");
+    }
+
+    private void requeryAdapter () {
+        cursorAdapter.swapCursor(query());
+    }
+
     private MatchCursorAdapter matchCursorAdapterFactory () {
-        Cursor c = db.query("match", MATCH_COLS, null, null, null, null, "date_entered DESC");
-        return new MatchCursorAdapter(context, c);
+        return new MatchCursorAdapter(context, query());
     }
 
     private class MatchCursorAdapter extends CursorAdapter {

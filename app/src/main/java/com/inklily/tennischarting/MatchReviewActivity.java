@@ -56,7 +56,12 @@ public class MatchReviewActivity extends Activity implements MatchStorage.OnStor
         });
 
         mStorage = SQLiteMatchStorage.getGlobalInstance(this.getApplication());
-        mStorage.addOnStorageAvailableListener(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mStorage.addOnStorageAvailableListener(this);
+    }
 }

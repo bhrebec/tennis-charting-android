@@ -45,7 +45,11 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
 
         point_adapter = new ArrayAdapter<Point>(this, android.R.layout.simple_list_item_1, match.points);
         point_list.setAdapter(point_adapter);
-        setTitle(String.format("%s/%s", match.player1, match.player2));
+        updateTitle();
+    }
+
+    public void updateTitle() {
+        setTitle(String.format("%s/%s - %s", match.player1, match.player2, match.score()));
     }
 
     public void toMainActivity() {
@@ -89,7 +93,9 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         p.setPoint(text.getText().toString());
+                        match.rescore();
                         point_adapter.notifyDataSetChanged();
+                        updateTitle();
                     }
                 });
                 builder.show();

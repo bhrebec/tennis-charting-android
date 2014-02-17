@@ -229,15 +229,15 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		switch (current_state) {
 		case SERVE:
 			serveGuide.setVisibility(View.VISIBLE);
-			serveGuide.setCourt(nextStrokeNear, deuce, false);
+			serveGuide.setCourt(!nextStrokeNear, deuce, false);
 			break;
 		case STROKE:
 			shotGuide.setVisibility(View.VISIBLE);
-			shotGuide.setCourt(!nextStrokeNear, false, nextStrokeRightHanded);
+			shotGuide.setCourt(nextStrokeNear, false, nextStrokeRightHanded);
 			break;
 		case LOCATION:
 			locationGuide.setVisibility(View.VISIBLE);
-			locationGuide.setCourt(nextStrokeNear, false, nextLocRightHanded);
+			locationGuide.setCourt(!nextStrokeNear, false, nextLocRightHanded);
 			break;
 		}
 	}
@@ -326,10 +326,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	 * @param direction direction of the stroke
 	 */
 	private boolean recordStroke(Direction direction) {
-
-		updateHandedness();
-		nextStrokeNear = !nextStrokeNear;
-
 		currentPoint.addStroke(currentStroke, direction);
 
 		Log.i("Shot", currentPoint.toString());

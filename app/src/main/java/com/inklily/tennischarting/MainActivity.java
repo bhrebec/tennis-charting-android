@@ -1,4 +1,37 @@
 package com.inklily.tennischarting;
+/**
+ * TODO
+ * ====
+ *
+ * 1. Serve screen
+ *    a. Display server name
+ *    b. Display 1st/2nd serve
+ *    c. Net approach (up swipe)
+ *    d. Unknown direction (LR swipe)
+ *    e. Display current score
+ * 2. Location screen
+ *    a. Unknown direction (LR swipe)
+ *    b. Net approach (up swipe)
+ * 3. Stroke screen
+ *    a. Display player name / court end
+ * 4. Point end screen
+ *    a. Speculative scores
+ *    b. Player wins game/set match
+ * 5. Match review screen
+ *    a. Score for each point
+ *    b. Add point.
+ *    c. Insert point
+ *    d. Delete all matches
+ * 6. New match screen
+ *    a. Need to be able to access from review
+ *    b. Remember previous values
+ *    c. Need to remove from stack after starting match
+ * 7. Settings screen
+ *    a. Strokes only
+ *    b. Depth on return
+ *    c. Depth everywhere
+ * 8. Help
+ */
 
 import android.os.Bundle;
 import android.app.Activity;
