@@ -4,11 +4,9 @@ package com.inklily.tennischarting;
  * ====
  *
  * 1. Serve screen
- *    a. Display server name
  *    b. Display 1st/2nd serve
  *    c. Net approach (up swipe)
  *    d. Unknown direction (LR swipe)
- *    e. Display current score
  * 2. Location screen
  *    a. Unknown direction (LR swipe)
  *    b. Net approach (up swipe)

@@ -81,5 +81,6 @@
     <string name="submit_email_address">jeffsackmann@gmail.com</string>
     <string name="send_later">Send Later</string>
     <string name="continue_match">Continue Match</string>
+    <string name="serving_at">serving @ </string>
 
 </resources>

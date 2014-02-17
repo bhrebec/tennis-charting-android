@@ -93,49 +93,6 @@
     </view>
 
     <view
-        android:id="@+id/serve_guide"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="com.inklily.tennischarting.MatchChartActivity$ServeGuide"
-        android:background="#cc5500" >
-
-        <TextView
-            android:id="@+id/serve_body_loc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/serve_left_loc"
-            android:layout_alignBottom="@+id/serve_left_loc"
-            android:layout_centerHorizontal="true"
-            android:text="@string/serve_body"
-            android:textColor="#fff"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/serve_left_loc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="43dp"
-            android:layout_marginTop="41dp"
-            android:text="@string/serve_t"
-            android:textColor="#fff"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/serve_right_loc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/serve_body_loc"
-            android:layout_alignBottom="@+id/serve_body_loc"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="45dp"
-            android:text="@string/serve_wide"
-            android:textColor="#fff"
-            android:textSize="24sp" />
-    </view>
-
-    <view
         class="com.inklily.tennischarting.MatchChartActivity$LocationGuide"
         android:id="@+id/location_guide"
         android:layout_width="match_parent"
@@ -177,5 +134,81 @@
             android:textColor="#fff"
             android:textSize="24sp" />
 
+    </view>
+
+    <view
+        android:id="@+id/serve_guide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.inklily.tennischarting.MatchChartActivity$ServeGuide"
+        android:background="#cc5500" >
+
+        <TextView
+            android:id="@+id/serve_body_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/serve_left_loc"
+            android:layout_alignBottom="@+id/serve_left_loc"
+            android:layout_centerHorizontal="true"
+            android:text="@string/serve_body"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/serve_left_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="43dp"
+            android:layout_marginTop="41dp"
+            android:text="@string/serve_t"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/serve_right_loc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/serve_body_loc"
+            android:layout_alignBottom="@+id/serve_body_loc"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="45dp"
+            android:text="@string/serve_wide"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/serve_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/serve_body_loc"
+            android:text="Williams, Venus"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="45dp"
+            android:textColor="#ddd"
+            android:textSize="20sp" />
+        />
+        <TextView
+            android:id="@+id/serve_pts_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/serve_server"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="45dp"
+            android:text="serving \@ 30-15"
+            android:textColor="#ddd"
+            android:textSize="20sp" />
+            />
+        <TextView
+            android:id="@+id/serve_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/serve_pts_score"
+            android:layout_centerHorizontal="true"
+            android:text="6-0 4-4"
+            android:layout_marginLeft="45dp"
+            android:textColor="#ddd"
+            android:textSize="20sp" />
+            />
     </view>
 </FrameLayout>

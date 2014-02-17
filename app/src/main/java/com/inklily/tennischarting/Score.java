@@ -196,37 +196,11 @@ public class Score {
 	}
 	
 	public String toString() {
-		StringBuilder score = new StringBuilder();
-		int end = mCurrentSet == mSets ? mSets : mCurrentSet + 1;
-		for (int i = 0; i < end; i++) {
-			int t1 = p1_tbs[i];
-			int t2 = p2_tbs[i];
-			if (t1 != 0 || t2 != 0)
-				score.append(String.format("%s-%s(%s)", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
-			else
-				score.append(String.format("%s-%s", p1_games[i], p2_games[i]));
-            if (i != end - 1)
-                score.append(" ");
-		}
-
-
-        if (!isComplete()) {
-            String p1_pts_str;
-            String p2_pts_str;
-            if (in_tb()) {
-                p1_pts_str = Integer.toString(p1_pts);
-                p2_pts_str = Integer.toString(p2_pts);
-            } else {
-                p1_pts_str = PTS_TABLE[p1_pts];
-                p2_pts_str = PTS_TABLE[p2_pts];
-            }
-            if (server() == 1)
-                score.append(String.format(":%s-%s", p1_pts_str, p2_pts_str));
-            else
-                score.append(String.format(":%s-%s", p2_pts_str, p1_pts_str));
+        if (isComplete()) {
+            return gameScore();
+        } else {
+            return String.format("%s:%s", gameScore(), ptsScore());
         }
-
-		return score.toString();
 	}
 	
 	/**
@@ -248,4 +222,43 @@ public class Score {
 		else
 			return near;
 	}
+
+    public String gameScore() {
+        StringBuilder score = new StringBuilder();
+        int end = mCurrentSet == mSets ? mSets : mCurrentSet + 1;
+        for (int i = 0; i < end; i++) {
+            int t1 = p1_tbs[i];
+            int t2 = p2_tbs[i];
+            if (t1 != 0 || t2 != 0)
+                score.append(String.format("%s-%s(%s)", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
+            else
+                score.append(String.format("%s-%s", p1_games[i], p2_games[i]));
+            if (i != end - 1)
+                score.append(" ");
+        }
+
+
+        return score.toString();
+    }
+
+    public String ptsScore() {
+        if (!isComplete()) {
+            String p1_pts_str;
+            String p2_pts_str;
+            if (in_tb()) {
+                p1_pts_str = Integer.toString(p1_pts);
+                p2_pts_str = Integer.toString(p2_pts);
+            } else {
+                p1_pts_str = PTS_TABLE[p1_pts];
+                p2_pts_str = PTS_TABLE[p2_pts];
+            }
+            if (server() == 1)
+                return (String.format("%s-%s", p1_pts_str, p2_pts_str));
+            else
+                return (String.format("%s-%s", p2_pts_str, p1_pts_str));
+        } else {
+            return "";
+        }
+    }
+
 }

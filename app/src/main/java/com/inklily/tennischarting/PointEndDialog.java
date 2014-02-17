@@ -375,7 +375,7 @@ public class PointEndDialog extends DialogFragment {
 
 		mPointEditor.setText(mPoint.toString());
 		mPointEditor.invalidate();
-        mScore.setText(mMatch.score());
+        mScore.setText(mMatch.score().toString());
 	}
 	
 	@Override

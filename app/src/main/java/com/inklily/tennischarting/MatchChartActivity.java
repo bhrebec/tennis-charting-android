@@ -68,9 +68,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	private PointF mGestureStart = new PointF();
 	private PointF mGestureEnd = new PointF();
 	private boolean mActiveGesture = false;
-	private boolean nextStrokeRightHanded = true;
-    private boolean nextLocRightHanded = true;
-	private boolean nextStrokeNear = true;
 	private boolean disableInput;
 	
 	private Match match;
@@ -176,18 +173,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		currentPoint = new Point(firstServe, match.server());
 	}
 
-	private void updateHandedness() {
-		int n = currentPoint.nextPlayer();
-
-        // Handedness of the next shot returner
-		nextLocRightHanded = match.rightHanded(n);
-        // Handedness of the next shot striker
-		nextStrokeRightHanded = match.rightHanded(n % 2 + 1);
-
-        // Is the next stroke near to the camera?
-        nextStrokeNear = match.near() ^ (currentPoint.shotCount() % 2 == 0);
-	}
-
 	private void savePoint() {
         try {
             match.addPoint(currentPoint, matchStorage);
@@ -215,29 +200,22 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
 	
 	private void updateUI() {
-        updateHandedness();
-
 		serveGuide.setVisibility(View.INVISIBLE);
 		locationGuide.setVisibility(View.INVISIBLE);
 		shotGuide.setVisibility(View.INVISIBLE);
 
-        boolean deuce = match.deuceCourt();
-        Log.d("updateUI", String.format("%s %s %s",
-                nextStrokeNear ? "Near" : "Far",
-                nextStrokeRightHanded ? "Right" : "Left",
-                deuce ? "Deuce" : "Ad"));
 		switch (current_state) {
 		case SERVE:
 			serveGuide.setVisibility(View.VISIBLE);
-			serveGuide.setCourt(!nextStrokeNear, deuce, false);
+			serveGuide.setPoint(match, currentPoint);
 			break;
 		case STROKE:
 			shotGuide.setVisibility(View.VISIBLE);
-			shotGuide.setCourt(nextStrokeNear, false, nextStrokeRightHanded);
+			shotGuide.setPoint(match, currentPoint);
 			break;
 		case LOCATION:
 			locationGuide.setVisibility(View.VISIBLE);
-			locationGuide.setCourt(!nextStrokeNear, false, nextLocRightHanded);
+			locationGuide.setPoint(match, currentPoint);
 			break;
 		}
 	}
@@ -376,7 +354,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		float dY = mGestureStart.y  - mGestureEnd.y;
 		boolean left = mGestureStart.x < centerLegend.getLeft();
 		boolean right = mGestureStart.x > centerLegend.getRight();
-		boolean rightForehand = nextStrokeRightHanded == nextStrokeNear;
+		boolean rightForehand = shotGuide.isRightHanded();
 		
 		if (!right)
 			dX = -dX;
@@ -440,13 +418,15 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		final float GUIDE_WIDTH = 2.0f;
 		final int LINE_COLOR = Color.rgb(220, 220, 220);
 		final int GUIDE_COLOR = Color.rgb(220, 220, 220);
-		protected boolean nearCourt = true;
-		protected boolean deuceCourt = true;
-		protected boolean rightHanded = true;
+		private boolean nearCourt = true;
+		private boolean deuceCourt = true;
+        protected boolean strokeRightHanded;
+        protected boolean locRightHanded;
 		protected Paint mLinePaint = new Paint();
 		protected Paint mGuidePaint = new Paint();
+        protected String nextPlayer;
 
-		public GuideView(Context context, AttributeSet attrs) {
+        public GuideView(Context context, AttributeSet attrs) {
 			super(context, attrs);
 			DisplayMetrics metrics = getResources().getDisplayMetrics();
 			float density = metrics.density;
@@ -459,13 +439,23 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			mLinePaint.setStrokeWidth(LINE_WIDTH * density);
 		}
 
-		public void setCourt(boolean near, boolean deuce, boolean righthand) {
-			if (nearCourt != near || deuceCourt != deuce || righthand != rightHanded)
-				this.invalidate();
+        protected boolean near() {
+            return nearCourt;
+        }
 
-			nearCourt = near;
-			deuceCourt = deuce;
-			rightHanded = righthand;
+        protected boolean deuce() {
+            return deuceCourt;
+        }
+
+        public void setPoint(Match match, Point point) {
+			nearCourt = match.nextNearFor(point);
+			deuceCourt = match.deuceCourt();
+			strokeRightHanded = match.nextStrokeRighthandedFor(point);
+            locRightHanded = match.nextStrokeRighthandedFor(point);
+
+            nextPlayer = match.playerName(point.nextPlayer());
+
+            invalidate();
 		}
 
 		protected void drawGuides(Canvas canvas) {
@@ -478,7 +468,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			canvas.drawLine(g1x, 0.0f, g1x, h, mGuidePaint);
 			canvas.drawLine(g2x, 0.0f, g2x, h, mGuidePaint);
 		}
-	}
+
+        public boolean isRightHanded() {
+            return strokeRightHanded == nearCourt;
+        }
+    }
 
 	public static class ServeGuide extends GuideView {
 		final float SERVICE_LINE_INSET = 50.0f;
@@ -489,6 +483,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		public ServeGuide(Context context, AttributeSet attrs) {
 			super(context, attrs);
 		}
+
+        @Override
+        protected boolean near() {
+            return !super.near();
+        }
 		
 		public ServeDirection getServeDirection(float x) {
 			float w = (float)this.getWidth();
@@ -498,7 +497,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				return Point.ServeDirection.BODY;
 			}
 
-			if ((nearCourt && deuceCourt) || (!nearCourt && !deuceCourt)) {
+			if (near() == deuce()) {
 				if (x < g1x)
 					return Point.ServeDirection.T;
 				else
@@ -513,15 +512,20 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 
 		@Override
-		public void setCourt(boolean near, boolean deuce, boolean righthand) {
-			super.setCourt(near, deuce, righthand);
-			
+        public void setPoint(Match match, Point point) {
+			super.setPoint(match, point);
+
+            ((TextView) this.findViewById(R.id.serve_server)).setText(match.playerName(match.server()));
+            ((TextView) this.findViewById(R.id.serve_pts_score)).setText(getResources().getString(R.string.serving_at)
+                    + match.score().ptsScore());
+            ((TextView) this.findViewById(R.id.serve_score)).setText(match.score().gameScore());
+
 			if (serve_l == null)
 				serve_l = ((TextView) this.findViewById(R.id.serve_left_loc));
 			if (serve_r == null)
 				serve_r = ((TextView) this.findViewById(R.id.serve_right_loc));
 			
-			if ((near && deuce) || (!near && !deuce)) {
+			if (near() == deuce()) {
 				serve_l.setText(R.string.serve_t);
 				serve_r.setText(R.string.serve_wide);
 			} else {
@@ -539,19 +543,19 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			float w = (float)this.getWidth();
 
 			// Draw court lines
-			if (deuceCourt && nearCourt) {
+			if (deuce() && near()) {
 				canvas.drawLine(w - LINE_WIDTH / 2, 0.0f, w - LINE_WIDTH / 2, h, mLinePaint); // sideline
 				canvas.drawLine(0.0f, h - SERVICE_LINE_INSET, w, h - SERVICE_LINE_INSET, mLinePaint); // service line
 				canvas.drawLine(T_LINE_INSET, 0.0f, T_LINE_INSET, h - SERVICE_LINE_INSET, mLinePaint); // T line
-			} else if (deuceCourt && !nearCourt) {
+			} else if (deuce() && !near()) {
 				canvas.drawLine(LINE_WIDTH / 2, 0.0f, LINE_WIDTH / 2, h, mLinePaint); // sideline
 				canvas.drawLine(0.0f, SERVICE_LINE_INSET, w, SERVICE_LINE_INSET, mLinePaint); // service line
 				canvas.drawLine(w - T_LINE_INSET, SERVICE_LINE_INSET, w - T_LINE_INSET, h, mLinePaint); // T line
-			} else if (!deuceCourt && nearCourt) {
+			} else if (!deuce() && near()) {
 				canvas.drawLine(LINE_WIDTH / 2, 0.0f, LINE_WIDTH / 2, h, mLinePaint); // sideline
 				canvas.drawLine(0.0f, h - SERVICE_LINE_INSET, w, h - SERVICE_LINE_INSET, mLinePaint); // service line
 				canvas.drawLine(w - T_LINE_INSET, 0, w - T_LINE_INSET, h - SERVICE_LINE_INSET, mLinePaint); // T line
-			} else if (!deuceCourt && !nearCourt) {
+			} else if (!deuce() && !near()) {
 				canvas.drawLine(w - LINE_WIDTH / 2, 0.0f, w - LINE_WIDTH / 2, h, mLinePaint); // sideline
 				canvas.drawLine(0.0f, SERVICE_LINE_INSET, w, SERVICE_LINE_INSET, mLinePaint); // service line
 				canvas.drawLine(T_LINE_INSET, SERVICE_LINE_INSET, T_LINE_INSET, h, mLinePaint); // T line
@@ -569,16 +573,21 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			super(context, attrs);
 		}
 
-		@Override
-		public void setCourt(boolean near, boolean deuce, boolean righthand) {
-			super.setCourt(near, deuce, righthand);
-			
+        @Override
+        protected boolean near() {
+            return !super.near();
+        }
+
+        @Override
+        public void setPoint(Match match, Point point) {
+            super.setPoint(match, point);
+
 			if (shot_l == null)
 				shot_l = ((TextView) this.findViewById(R.id.shot_left_loc));
 			if (shot_r == null)
 				shot_r = ((TextView) this.findViewById(R.id.shot_right_loc));
-			
-			if (near == righthand) {
+
+			if (near() == locRightHanded) {
 				shot_l.setText(R.string.backhand_side);
 				shot_r.setText(R.string.forehand_side);
 			} else {
@@ -595,7 +604,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				return Point.Direction.MIDDLE;
 			}
 
-			if (nearCourt) {
+			if (near()) {
 				if (x < g1x)
 					return Point.Direction.AD;
 				else
@@ -606,8 +615,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				else
 					return Point.Direction.AD;
 			}
-					
+
 		}
+
+        public boolean isRightHanded() {
+            return locRightHanded == near();
+        }
 
 		@Override
 		protected void onDraw(Canvas canvas) {
@@ -619,7 +632,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			// Draw court lines
 			float T_y1 = 0.0f;
 			float T_y2 = 0.0f;
-			if (nearCourt) {
+			if (near()) {
 				T_y1 = h * 0.33f;
 				T_y2 = 0.0f;
 			} else {
@@ -632,7 +645,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			canvas.drawLine(w - LINE_WIDTH / 2, 0.0f, w - LINE_WIDTH / 2, h, mLinePaint);
 
 			// Baseline
-			if (nearCourt)
+			if (near())
 				canvas.drawLine(0.0f, h - LINE_WIDTH / 2, w, h - LINE_WIDTH / 2, mLinePaint);
 			else
 				canvas.drawLine(0.0f, LINE_WIDTH / 2, w, LINE_WIDTH / 2, mLinePaint);
@@ -657,15 +670,15 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 
 		@Override
-		public void setCourt(boolean near, boolean deuce, boolean righthand) {
-			super.setCourt(near, deuce, righthand);
-			
+        public void setPoint(Match match, Point point) {
+            super.setPoint(match, point);
+
 			if (right_hand == null)
 				right_hand = ((TextView) this.findViewById(R.id.right_hand));
 			if (left_hand == null)
 				left_hand = ((TextView) this.findViewById(R.id.left_hand));
 			
-			if (near == rightHanded) {
+			if (near() == strokeRightHanded) {
 				left_hand.setText(R.string.backhand);
 				right_hand.setText(R.string.forehand);
 			} else {

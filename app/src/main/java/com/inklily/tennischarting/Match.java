@@ -98,12 +98,42 @@ public class Match {
 		return s.toString();
 	}
 	
-	public String score() {
-		return current_score.toString();
+	public Score score() {
+		return current_score;
 	}
 
     public void rescore() {
         current_score.reScore(points);
+    }
+
+    /**
+     * return True if next stroke will be right-handed for the given in-progress point.
+     * @param inProgressPoint
+     */
+    public boolean nextStrokeRighthandedFor(Point inProgressPoint) {
+        int n = inProgressPoint.nextPlayer();
+
+        // Handedness of the next shot striker
+        return rightHanded(n % 2 + 1);
+    }
+
+    /**
+     * return True if next location will be right-handed for the given in-progress point.
+     * @param inProgressPoint
+     */
+    public boolean nextLocRighthandedFor(Point inProgressPoint) {
+        int n = inProgressPoint.nextPlayer();
+
+        // Handedness of the next shot returner
+        return rightHanded(n);
+    }
+
+    /**
+     * return True if next stroke will be near for the given in-progress point.
+     * @param inProgressPoint
+     */
+    public boolean nextNearFor(Point inProgressPoint) {
+        return near() ^ (inProgressPoint.shotCount() % 2 == 0);
     }
 
     String outputRow(Point serve1, Point serve2) {
@@ -151,4 +181,11 @@ public class Match {
 		
 		return output.toString();
 	}
+
+    public String playerName(int i) {
+        if (i == 1)
+            return player1;
+        else
+            return player2;
+    }
 }
