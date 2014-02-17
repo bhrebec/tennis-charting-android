@@ -4,7 +4,10 @@ import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -23,24 +26,63 @@ import android.widget.ToggleButton;
  */
 public class MatchInfoActivity extends Activity implements OnClickListener {
 
-	private AutoCompleteTextView player1_name;
-	private AutoCompleteTextView player2_name;
 	private SQLiteMatchStorage matchStorage;
+
+    private final static int[] PERSIST_ID = {
+            R.id.match_tournament,
+            R.id.match_charted_by,
+            R.id.match_surface,
+    };
+
+    private void addAutocorrect(int id, ArrayAdapter<String> adapter) {
+        AutoCompleteTextView v = (AutoCompleteTextView) findViewById(id);
+        v.setAdapter(adapter);
+    }
+
+    private void addAutocorrect(int id, int array) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                getResources().getStringArray(array));
+        addAutocorrect(id, adapter);
+    }
+
+    private void saveValues() {
+        Resources res = getResources();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor e = prefs.edit();
+        for (int id : PERSIST_ID) {
+            TextView v = (TextView) findViewById(id);
+            e.putString("match_info_" + res.getResourceEntryName(id), v.getText().toString());
+        }
+        e.commit();
+    }
+    private void loadValues() {
+        Resources res = getResources();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        for (int id : PERSIST_ID) {
+            TextView v = (TextView) findViewById(id);
+            v.setText(prefs.getString("match_info_" + res.getResourceEntryName(id), ""));
+        }
+    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_match_info);
-		
-		player1_name = (AutoCompleteTextView) findViewById(R.id.match_p1_name);
-		player2_name = (AutoCompleteTextView) findViewById(R.id.match_p2_name);
+
 		String[] player_names = getResources().getStringArray(R.array.players_array);
 		ArrayAdapter<String> player_name_adapter = new ArrayAdapter<String>(this, 
 				android.R.layout.simple_list_item_1, player_names);
-		player1_name.setAdapter(player_name_adapter);
-		player2_name.setAdapter(player_name_adapter);
-		
+        addAutocorrect(R.id.match_p1_name, player_name_adapter);
+        addAutocorrect(R.id.match_p2_name, player_name_adapter);
+        addAutocorrect(R.id.match_round, R.array.round_array);
+        addAutocorrect(R.id.match_umpire, R.array.umpire_array);
+        addAutocorrect(R.id.match_court, R.array.court_array);
+        addAutocorrect(R.id.match_tournament, R.array.tournament_array);
+        addAutocorrect(R.id.match_surface, R.array.surface_array);
+
+        loadValues();
+
 		Button start = (Button) findViewById(R.id.match_start_charting);
 		start.setOnClickListener(this);
 		
@@ -79,6 +121,7 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
 	public void onClick(View arg0) {
 		Match m = new Match(3, true, true); // TODO: allow editing of existing match
 		updateMatch(m);
+        saveValues();
 		
 		try {
 			matchStorage.saveMatch(m);

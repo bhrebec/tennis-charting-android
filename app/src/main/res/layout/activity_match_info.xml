@@ -128,54 +128,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/men" />
         </RadioGroup>
-
-        <DatePicker
-            android:id="@+id/match_date"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TimePicker
-            android:id="@+id/match_time"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/match_tournament"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/tournament_name" />
-
-        <EditText
-            android:id="@+id/match_round"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/round" />
-
-        <EditText
-            android:id="@+id/match_court"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/court" />
-
-        <EditText
-            android:id="@+id/match_surface"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/surface" />
-
-        <EditText
-            android:id="@+id/match_umpire"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/umpire" />
-
         <RadioGroup
             android:id="@+id/RadioGroup02"
             android:layout_width="match_parent"
@@ -198,6 +150,8 @@
 
         </RadioGroup>
 
+
+
         <ToggleButton
             android:id="@+id/match_final_set_tb"
             android:layout_width="match_parent"
@@ -205,12 +159,6 @@
             android:checked="true"
             android:textOff="@string/no_final_tb"
             android:textOn="@string/final_tb" />
-        <EditText
-            android:id="@+id/match_charted_by"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/charted_by" />
         <ToggleButton
             android:id="@+id/match_first_serve_near"
             android:layout_width="match_parent"
@@ -218,7 +166,87 @@
             android:checked="true"
             android:textOff="@string/first_service_game_on_far_side"
             android:textOn="@string/first_service_game_on_near_side" />
-        
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:padding="3dp"
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <DatePicker
+            android:id="@+id/match_date"
+            android:calendarViewShown="false"
+            android:spinnersShown="true"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TimePicker
+            android:id="@+id/match_time"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:padding="3dp"
+        android:background="#eee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <AutoCompleteTextView
+            android:id="@+id/match_tournament"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/tournament_name" />
+
+        <AutoCompleteTextView
+            android:id="@+id/match_round"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/round" />
+
+        <AutoCompleteTextView
+            android:id="@+id/match_court"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/court" />
+
+        <AutoCompleteTextView
+            android:id="@+id/match_surface"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/surface" />
+
+        <AutoCompleteTextView
+            android:id="@+id/match_umpire"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:ems="10"
+            android:hint="@string/umpire" />
+        <EditText
+            android:id="@+id/match_charted_by"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/charted_by" />
         <Button
             android:id="@+id/match_start_charting"
             android:gravity="center"

@@ -675,6 +675,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		@Override
         public void setPoint(Match match, Point point) {
             super.setPoint(match, point);
+            ((TextView) this.findViewById(R.id.stoke_player)).setText(match.playerName(point.nextPlayer()));
 
 			if (right_hand == null)
 				right_hand = ((TextView) this.findViewById(R.id.right_hand));
