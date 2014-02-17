@@ -29,9 +29,7 @@ import android.widget.TextView;
 public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private final static String DATABASE_NAME = "matches";
 	private final static int DB_VERSION_1 = 1;
-    private final static int DB_VERSION_2 = 2;
-    private final static int DB_VERSION_3 = 3;
-	private final static int CURRENT_DB_VERSION = DB_VERSION_3;
+	private final static int CURRENT_DB_VERSION = DB_VERSION_1;
     private final static SimpleDateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private final static String[] MATCH_COLS = { "_id", "player1", "player2" , "player1hand" ,
@@ -89,15 +87,11 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
                     "sent DEFAULT (0), date_entered, " +
 					"PRIMARY KEY (_id))");
 			db.execSQL("CREATE TABLE IF NOT EXISTS point(match_id INTEGER, " +
-                    "seq INTEGER, point TEXT, first_serve, server, UNIQUE(match_id, seq))");
+                    "seq INTEGER, point TEXT, server, UNIQUE(match_id, seq))");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion == DB_VERSION_2) {
-                db.execSQL("DROP TABLE match");
-                onCreate(db);
-            }
 		}
 	}
 	
@@ -166,7 +160,6 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		ContentValues vals = new ContentValues();
 		vals.put("match_id", m.id);
 		vals.put("seq", p.seq);
-		vals.put("first_serve", p.isFirstServe());
 		vals.put("server", p.server());
 		vals.put("point", p.toString());
         db.replace("point", null, vals);
@@ -259,11 +252,11 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         Match m = makeMatch(c);
         c.close();
 
- 		final String[] point_cols = { "match_id", "first_serve", "server", "seq", "point" };
+ 		final String[] point_cols = { "match_id", "server", "seq", "point" };
  		Cursor pc = db.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
- 			Point p = new Point(pc.getInt(1) == 1, pc.getInt(2), pc.getString(4));
- 			p.seq = pc.getInt(3);
+ 			Point p = new Point(pc.getInt(1), pc.getString(3));
+ 			p.seq = pc.getInt(2);
  			m.addPoint(p);
  		}
         pc.close();

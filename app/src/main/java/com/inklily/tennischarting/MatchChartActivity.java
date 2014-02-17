@@ -164,13 +164,13 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		mSystemUiHider.setup();
 		mSystemUiHider.hide();
 
-		newPoint(true);
+		newPoint();
 		
 		updateUI();
 	}
 	
-	private void newPoint(boolean firstServe) {
-		currentPoint = new Point(firstServe, match.server());
+	private void newPoint() {
+		currentPoint = new Point(match.server());
 	}
 
 	private void savePoint() {
@@ -181,10 +181,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             e.printStackTrace();
         }
 
-        if (currentPoint.isFault() && currentPoint.isFirstServe())
-			newPoint(false);
-		else
-			newPoint(true);
+        newPoint();
 
         if (match.isComplete()) {
             endMatch();
@@ -516,8 +513,14 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			super.setPoint(match, point);
 
             ((TextView) this.findViewById(R.id.serve_server)).setText(match.playerName(match.server()));
-            ((TextView) this.findViewById(R.id.serve_pts_score)).setText(getResources().getString(R.string.serving_at)
-                    + match.score().ptsScore());
+            ((TextView) this.findViewById(R.id.serve_pts_score)).setText(
+                    String.format("%s %s %s",
+                            match.score().isFirstServe() ?
+                                    getResources().getString(R.string.first) :
+                                    getResources().getString(R.string.second),
+                            getResources().getString(R.string.serving_at),
+                            match.score().ptsScore())
+            );
             ((TextView) this.findViewById(R.id.serve_score)).setText(match.score().gameScore());
 
 			if (serve_l == null)

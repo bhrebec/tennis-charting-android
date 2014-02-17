@@ -168,14 +168,18 @@ public class Match {
 		output.append(",\n,\n");
 		Point serve1 = null;
 		Point serve2 = null;
+
+        // Score along to determine first serves
+        Score tmpScore = new Score(mSets, mFinalTb);
 		for (Point p : points) {
-			if (p.isFirstServe()) {
+			if (tmpScore.isFirstServe()) {
 				output.append(outputRow(serve1, serve2));
 				serve1 = p;
 				serve2 = null;
 			} else {
 				serve2 = p;
 			}
+            tmpScore.score_point(p);
 		}
 		output.append(outputRow(serve1, serve2)); // output the last row if there is one
 		

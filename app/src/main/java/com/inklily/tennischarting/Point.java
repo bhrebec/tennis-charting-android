@@ -8,7 +8,6 @@ public class Point {
 	public Integer seq;
 	private StringBuilder data;
 
-	private boolean mFirstServe;
 	private int mServer;
 	public String comments = "";
 	
@@ -148,7 +147,7 @@ public class Point {
 	 * Copy constructor
 	 */
 	public Point(Point p) {
-		this(p.mFirstServe, p.mServer, p.toString());
+		this(p.mServer, p.toString());
 		this.seq = p.seq;
 		this.comments = p.comments;
 	}
@@ -156,21 +155,18 @@ public class Point {
 	/**
 	 * Create an empty point.
 	 * 
-	 * @param firstServe True if this point is a first serve
 	 * @param server 1 or 2, the player who is serving
 	 */
-	public Point(boolean firstServe, int server) {
-		this(firstServe, server, "");
+	public Point(int server) {
+		this(server, "");
 	}
 
 	/**
 	 * 
-	 * @param firstServe True if this point is a first serve
 	 * @param server 1 or 2, the player who is serving
 	 * @param point string representation of the point
 	 */
-	public Point(boolean firstServe, int server, String point) {
-		mFirstServe = firstServe;
+	public Point(int server, String point) {
 		mServer = server;
 		data = new StringBuilder(point);
 	}
@@ -308,21 +304,8 @@ public class Point {
 		return (winner() == returner() && shotCount() == 1);
 	}
 	
-	/**
-	 * Replays the point for the winner and the shot-count
-	 */
-	public void replayPoint() {
-		if (data.length() == 0)
-			return;
-		
-	}
-
 	public boolean isValid() {
 		return POINT_PATTERN.matcher(data).matches();
-	}
-	
-	public boolean isFirstServe() {
-		return mFirstServe;
 	}
 	
 	public int nextPlayer() {

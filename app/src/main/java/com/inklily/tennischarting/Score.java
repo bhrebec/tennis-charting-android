@@ -17,6 +17,7 @@ public class Score {
 	private int p2_pts = 0;
 	private int mSets;
 	private boolean mFinalTb;
+    private boolean mFirstServe = true;
 
 	private int mCurrentSet = 0;
 	
@@ -99,8 +100,12 @@ public class Score {
 			return false;
 
         // A first-serve fault doesn't affect the score
-        if (p.isFault() && p.isFirstServe())
+        if (p.isFault() && mFirstServe) {
+            mFirstServe = false;
             return true;
+        } else {
+            mFirstServe = true;
+        }
 
         if (winner == 1) {
 			p1_pts += 1;
@@ -261,4 +266,7 @@ public class Score {
         }
     }
 
+    public boolean isFirstServe() {
+        return mFirstServe;
+    }
 }
