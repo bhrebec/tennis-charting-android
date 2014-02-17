@@ -241,8 +241,9 @@ public class Score {
      * first receiver was far from the camera.
 	 */
 	public boolean near() {
-		boolean near = (((games() + 1) / 2) % 2) == 1;
-		if (in_tb() && (((p1_pts + p2_pts) / 6) % 2 == 1))
+		boolean near = ((games() / 2) % 2) == 1;
+        // The TB pattern is tricky - it's: FNNFFN FNNFFN, etc.
+		if (in_tb() && ((((p1_pts + p2_pts) % 6) + 1) / 2 % 2 == 1))
 			return !near;
 		else
 			return near;

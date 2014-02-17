@@ -268,7 +268,7 @@ public class ScoreTest extends TestCase {
 
         // 1-0
         addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
-        assertTrue(score3.toString(), score3.near());
+        assertFalse(score3.toString(), score3.near());
 
         // 1-1
         addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
@@ -276,9 +276,13 @@ public class ScoreTest extends TestCase {
 
         // 2-1
         addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
-        assertFalse(score3.toString(), score3.near());
+        assertTrue(score3.toString(), score3.near());
 
         // 2-2
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+
+        // 3-2
         addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
         assertFalse(score3.toString(), score3.near());
     }
@@ -288,9 +292,21 @@ public class ScoreTest extends TestCase {
         addPointsFor(score3, 4 * 12, Point.PointGiven.POINT_SERVER);
         assertFalse(score3.toString(), score3.near());
 
+        // 6-6, 1-0
+        addPointsFor(score3, 1, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+
+        // 6-6, 1-1
+        addPointsFor(score3, 1, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+
+        // 6-6, 2-1
+        addPointsFor(score3, 1, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+
         // 6-6, 3-3
         addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
-        assertTrue(score3.toString(), score3.near());
+        assertFalse(score3.toString(), score3.near());
 
         // 6-6, 6-6
         addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
@@ -298,6 +314,6 @@ public class ScoreTest extends TestCase {
 
         // 6-6, 9-9
         addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
-        assertTrue(score3.toString(), score3.near());
+        assertFalse(score3.toString(), score3.near());
     }
 }
