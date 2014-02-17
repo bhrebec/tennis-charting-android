@@ -180,8 +180,11 @@ public class PointTest extends TestCase {
 
     public void testShotCounts() {
         assertEquals(0, new Point(true, 1, "").shotCount());
-        assertEquals(1, new Point(true, 1, "P").shotCount());
-        assertEquals(1, new Point(true, 1, "3").shotCount());
+        assertEquals(0, new Point(true, 1, "P").shotCount());
+        assertEquals(0, new Point(true, 1, "R").shotCount());
+        assertEquals(0, new Point(true, 1, "S").shotCount());
+        assertEquals(0, new Point(true, 1, "Q").shotCount());
+        assertEquals(1, new Point(true, 1, "6").shotCount());
         assertEquals(2, new Point(true, 1, "4b").shotCount());
         assertEquals(2, new Point(true, 1, "5f1").shotCount());
         assertEquals(3, new Point(true, 1, "5f1b").shotCount());

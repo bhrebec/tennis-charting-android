@@ -59,12 +59,12 @@ public class Score {
 		mCurrentSet = 0;
 	}
 	
-	private int games() {
+	public int games() {
 		int c = 0;
 		int[][] arrays = { p1_games, p2_games };
 		for (int[] a : arrays) {
 			for (int i = 0; i < a.length; i++) {
-				c++;
+				c += a[i];
 			}
 		}
 		return c;
@@ -88,22 +88,28 @@ public class Score {
 	/**
 	 * Adds a point to the score.
 	 * @param p point to score
+     * @return true if point was scored
 	 */
-	void score_point(Point p) {
+	public boolean score_point(Point p) {
 		if (mCurrentSet == mSets)
-			return; // Match is over
+			return false; // Match is over
 
 		int winner = p.winner();
 		if (winner == 0)
-			return;
+			return false;
 
-		if (winner == 1) {
+        // A first-serve fault doesn't affect the score
+        if (p.isFault() && p.isFirstServe())
+            return true;
+
+        if (winner == 1) {
 			p1_pts += 1;
 		} else if (winner == 2) {
 			p2_pts += 1;
 		}
 		
 		normalize_score();
+        return true;
 	}
 	
 	/**
@@ -111,7 +117,7 @@ public class Score {
 	 * @return
 	 */
 	public boolean in_tb() {
-		if (p1_games[mCurrentSet] == 6 
+		if (p1_games[mCurrentSet] == 6
 				&& p2_games[mCurrentSet] == 6
 				&& !(mCurrentSet == mSets - 1 && !mFinalTb)) {
 			return true;
@@ -124,19 +130,18 @@ public class Score {
 	 * Makes a new set. 
 	 */
 	private void new_set() {
-		int p1_game = p1_games[mCurrentSet];
-		int p2_game = p2_games[mCurrentSet];
-		if (p1_game > p2_game || p2_game > p1_game) {
-			mCurrentSet++;
-		}
+        mCurrentSet++;
 	}
 
 	/**
-	 * Makes a new games.
+	 * Makes a new game.
 	 * 
 	 * Translate games into points, update structures for new game.
 	 */
 	private void new_game() {
+        // Save this, it can change as we change state
+        boolean was_in_tb = in_tb();
+
 		if (p1_pts > p2_pts)
 			p1_games[mCurrentSet]++;
 		else if (p2_pts > p1_pts)
@@ -144,18 +149,23 @@ public class Score {
 		else
 			return;
 
-		p1_pts = 0;
-		p2_pts = 0;
-		
-		int p1_game = p1_games[mCurrentSet];
-		int p2_game = p2_games[mCurrentSet];
-		
-		if (in_tb() && (p1_game == 7 || p2_game == 7))
+        if (was_in_tb) {
+            p1_tbs[mCurrentSet] = p1_pts;
+            p2_tbs[mCurrentSet] = p2_pts;
+        }
+
+        p1_pts = 0;
+        p2_pts = 0;
+
+        int p1_game = p1_games[mCurrentSet];
+        int p2_game = p2_games[mCurrentSet];
+        if (was_in_tb && (p1_game == 7 || p2_game == 7))
 			new_set();
 		else if ( (p1_game > 5 && p1_game - p2_game > 1) 
 				|| (p2_game > 5 && p2_game - p1_game > 1))
 			new_set();
-	}
+
+    }
 
 	/** 
 	 * Translate points into games as needed.
@@ -192,25 +202,30 @@ public class Score {
 			int t1 = p1_tbs[i];
 			int t2 = p2_tbs[i];
 			if (t1 != 0 || t2 != 0)
-				score.append(String.format("%s-%s(%s) ", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
+				score.append(String.format("%s-%s(%s)", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
 			else
-				score.append(String.format("%s-%s ", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
+				score.append(String.format("%s-%s", p1_games[i], p2_games[i]));
+            if (i != end - 1)
+                score.append(" ");
 		}
 
 
-        String p1_pts_str;
-        String p2_pts_str;
-        if (in_tb()) {
-            p1_pts_str = Integer.toString(p1_pts);
-            p2_pts_str = Integer.toString(p2_pts);
-        } else {
-            p1_pts_str = PTS_TABLE[p1_pts];
-            p2_pts_str = PTS_TABLE[p2_pts];
+        if (!isComplete()) {
+            String p1_pts_str;
+            String p2_pts_str;
+            if (in_tb()) {
+                p1_pts_str = Integer.toString(p1_pts);
+                p2_pts_str = Integer.toString(p2_pts);
+            } else {
+                p1_pts_str = PTS_TABLE[p1_pts];
+                p2_pts_str = PTS_TABLE[p2_pts];
+            }
+            if (server() == 1)
+                score.append(String.format(":%s-%s", p1_pts_str, p2_pts_str));
+            else
+                score.append(String.format(":%s-%s", p2_pts_str, p1_pts_str));
         }
-		if (server() == 0)
-			score.append(String.format(", %s-%s ", p1_pts_str, p2_pts_str));
-		else
-			score.append(String.format(", %s-%s ", p2_pts_str, p1_pts_str));
+
 		return score.toString();
 	}
 	

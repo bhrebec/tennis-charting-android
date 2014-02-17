@@ -14,9 +14,10 @@ public class Point {
 	
 	// TODO: build these from the enums?
 	private static final String VALID_SHOTS = "frvoulhjbszpymiktq";
-	private static final String SERVE_PATTERN_STRING = "c*^[0456]";
+	private static final String SERVE_PATTERN_STRING = "^c*[0456]";
 	private static final String RALLY_PATTERN_STRING = "[" + VALID_SHOTS + "][0123]?[0789]?";
 	private static final String ENDING_PATTERN_STRING = "([*e#@nwdxg!]|[nwdx!e][#@])$";
+    private static final Pattern SERVE_PATTERN = Pattern.compile(SERVE_PATTERN_STRING);
 	private static final Pattern ENDING_PATTERN = Pattern.compile(ENDING_PATTERN_STRING);
 	private static final Pattern SHOT_PATTERN = Pattern.compile("[" + VALID_SHOTS + "]");
 	private static final Pattern POINT_PATTERN = Pattern.compile("P|Q|R|S|" + SERVE_PATTERN_STRING 
@@ -280,7 +281,8 @@ public class Point {
 	public int shotCount() {
 		// Remove letchords,  they mess up the count
 		String clean_data = data.toString().replace("c", "");
-		if (clean_data.length() < 1)
+		if (clean_data.length() == 0
+                || !SERVE_PATTERN.matcher(clean_data).find())
 			return 0;
 		else
 			return SHOT_PATTERN.split(clean_data + " ").length; // Add a trailing space to correct points ending with a stroke
