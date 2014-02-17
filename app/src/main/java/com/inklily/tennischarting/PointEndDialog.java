@@ -133,6 +133,9 @@ public class PointEndDialog extends DialogFragment {
                 });
             } else if (which == 2) { // Flip near court
                 mMatch.nearServerFirst = !mMatch.nearServerFirst;
+            } else if (which == 3) { // Flip near court
+                mPoint.setPoint("");
+                continuePoint();
             }
         }
     };
@@ -145,7 +148,7 @@ public class PointEndDialog extends DialogFragment {
                 public Dialog onCreateDialog(Bundle savedInstanceState) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("More Options...");
-                    final String[] items = { "Point Penalty", "Retirement", "Flip Near Court"};
+                    final String[] items = { "Point Penalty", "Retirement", "Flip Court Vertically", "Clear Current Point"};
                     builder.setItems(items, mMoreDialogListener);
                     return builder.create();
                 }
