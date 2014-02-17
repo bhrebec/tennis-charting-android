@@ -37,10 +37,6 @@
             android:label="@string/review_matches" >
         </activity>
         <activity
-            android:name="com.inklily.tennischarting.MatchEndActivity"
-            android:label="@string/match_complete" >
-        </activity>
-        <activity
             android:name="com.inklily.tennischarting.MatchChartActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_match_chart"

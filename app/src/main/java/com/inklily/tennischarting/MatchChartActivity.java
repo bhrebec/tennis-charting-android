@@ -301,7 +301,19 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	 * @param direction direction of the stroke
 	 */
 	private boolean recordStroke(Direction direction) {
-		currentPoint.addStroke(currentStroke, direction);
+        float dX = mGestureStart.x  - mGestureEnd.x;
+        float dY = mGestureStart.y  - mGestureEnd.y;
+
+        if (distance(dX, dY) > TAP_MAX_DIST) {
+            double angle = angle(dX, dY);
+            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
+                currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
+            } else {
+                currentPoint.addStroke(currentStroke, Direction.UNKNOWN);
+            }
+        } else {
+            currentPoint.addStroke(currentStroke, direction);
+        }
 
 		Log.i("Shot", currentPoint.toString());
 		
