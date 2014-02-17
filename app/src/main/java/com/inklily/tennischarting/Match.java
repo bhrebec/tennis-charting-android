@@ -114,7 +114,7 @@ public class Match {
         int n = inProgressPoint.nextPlayer();
 
         // Handedness of the next shot striker
-        return rightHanded(n % 2 + 1);
+        return rightHanded(n);
     }
 
     /**
@@ -125,7 +125,7 @@ public class Match {
         int n = inProgressPoint.nextPlayer();
 
         // Handedness of the next shot returner
-        return rightHanded(n);
+        return rightHanded(n % 2 + 1);
     }
 
     /**

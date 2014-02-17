@@ -13,7 +13,7 @@ public class Point {
 	
 	// TODO: build these from the enums?
 	private static final String VALID_SHOTS = "frvoulhjbszpymiktq";
-	private static final String SERVE_PATTERN_STRING = "^c*[0456]";
+	private static final String SERVE_PATTERN_STRING = "^c*[0456][+]?";
 	private static final String RALLY_PATTERN_STRING = "[" + VALID_SHOTS + "][=+;-]?[0123]?[0789]?";
 	private static final String ENDING_PATTERN_STRING = "([*e#@nwdxg!]|[nwdx!e][#@])$";
     private static final Pattern SERVE_PATTERN = Pattern.compile(SERVE_PATTERN_STRING);
@@ -307,8 +307,11 @@ public class Point {
 	public boolean isValid() {
 		return POINT_PATTERN.matcher(data).matches();
 	}
-	
+
+    /**
+     * @return id of next player to strike the ball
+     */
 	public int nextPlayer() {
-		return (shotCount() % 2) == 1 ? server() : returner();
+		return (shotCount() % 2) == 0 ? server() : returner();
 	}
 }

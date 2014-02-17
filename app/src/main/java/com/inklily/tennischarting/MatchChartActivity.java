@@ -421,7 +421,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         protected boolean locRightHanded;
 		protected Paint mLinePaint = new Paint();
 		protected Paint mGuidePaint = new Paint();
-        protected String nextPlayer;
 
         public GuideView(Context context, AttributeSet attrs) {
 			super(context, attrs);
@@ -449,8 +448,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			deuceCourt = match.deuceCourt();
 			strokeRightHanded = match.nextStrokeRighthandedFor(point);
             locRightHanded = match.nextStrokeRighthandedFor(point);
-
-            nextPlayer = match.playerName(point.nextPlayer());
 
             invalidate();
 		}

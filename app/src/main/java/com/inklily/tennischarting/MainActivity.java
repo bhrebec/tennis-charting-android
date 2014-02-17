@@ -10,8 +10,6 @@ package com.inklily.tennischarting;
  * 2. Location screen
  *    a. Unknown direction (LR swipe)
  *    b. Net approach (up swipe)
- * 3. Stroke screen
- *    a. Display player name / court end
  * 4. Point end screen
  *    a. Speculative scores
  *    b. Player wins game/set match
@@ -22,7 +20,6 @@ package com.inklily.tennischarting;
  *    d. Delete all matches
  * 6. New match screen
  *    a. Need to be able to access from review
- *    b. Remember previous values
  *    c. Need to remove from stack after starting match
  * 7. Settings screen
  *    a. Strokes only
@@ -30,7 +27,6 @@ package com.inklily.tennischarting;
  *    c. Depth everywhere
  * 8. Help
  * 9. Data model
- *    a. Get first serves out of points and into Score where it belongs
  *    b. Test first serves
  */
 
