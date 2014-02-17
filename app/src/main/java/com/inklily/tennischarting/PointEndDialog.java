@@ -43,6 +43,7 @@ public class PointEndDialog extends DialogFragment {
 	private String[] mPlayers = new String[2];
     private Match mMatch;
     private TextView mScore;
+    private boolean editingPoint;
 
 
     View.OnClickListener mUnknownListener = new View.OnClickListener() {
@@ -303,6 +304,11 @@ public class PointEndDialog extends DialogFragment {
 				mPointEditor.requestFocus();
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(mPointEditor, InputMethodManager.SHOW_IMPLICIT);
+                mErrors.setVisibility(View.INVISIBLE);
+                mPointEndGroup.setVisibility(View.INVISIBLE);
+                mServeEndGroup.setVisibility(View.INVISIBLE);
+                mNextPoint.setVisibility(View.VISIBLE);
+                editingPoint = true;
 			}
 		});
 		mPointEditor = (EditText) mRootView.findViewById(R.id.point_edit_box);
@@ -326,11 +332,15 @@ public class PointEndDialog extends DialogFragment {
 	}
 	
 	private void finishPoint() {
+        if (editingPoint)
+            mPoint.setPoint(mPointEditor.getText().toString());
 		pointEndListener.onPointComplete(mPoint);
 		PointEndDialog.this.dismiss();
 	}
 
 	private void continuePoint() {
+        if (editingPoint)
+            mPoint.setPoint(mPointEditor.getText().toString());
 		mPoint.reopenPoint();
 		pointEndListener.onPointContinue(mPoint);
 		PointEndDialog.this.dismiss();

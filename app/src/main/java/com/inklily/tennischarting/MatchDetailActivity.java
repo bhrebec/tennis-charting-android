@@ -94,6 +94,11 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
                     public void onClick(DialogInterface dialog, int which) {
                         p.setPoint(text.getText().toString());
                         match.rescore();
+                        try {
+                            mStorage.savePoint(match, p);
+                        } catch (MatchStorage.MatchStorageNotAvailableException e) {
+                            e.printStackTrace();
+                        }
                         point_adapter.notifyDataSetChanged();
                         updateTitle();
                     }

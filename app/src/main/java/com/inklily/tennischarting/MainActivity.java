@@ -31,6 +31,9 @@ package com.inklily.tennischarting;
  *    b. Depth on return
  *    c. Depth everywhere
  * 8. Help
+ * 9. Data model
+ *    a. Get first serves out of points and into Score where it belongs
+ *    b. Test first serves
  */
 
 import android.os.Bundle;

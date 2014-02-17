@@ -196,7 +196,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             e.printStackTrace();
         }
 
-        if (currentPoint.isFault())
+        if (currentPoint.isFault() && currentPoint.isFirstServe())
 			newPoint(false);
 		else
 			newPoint(true);
@@ -376,7 +376,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		float dY = mGestureStart.y  - mGestureEnd.y;
 		boolean left = mGestureStart.x < centerLegend.getLeft();
 		boolean right = mGestureStart.x > centerLegend.getRight();
-		boolean rightForehand = nextStrokeRightHanded != nextStrokeNear;
+		boolean rightForehand = nextStrokeRightHanded == nextStrokeNear;
 		
 		if (!right)
 			dX = -dX;
@@ -578,7 +578,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			if (shot_r == null)
 				shot_r = ((TextView) this.findViewById(R.id.shot_right_loc));
 			
-			if ((near && righthand) || (!near && !righthand)) {
+			if (near == righthand) {
 				shot_l.setText(R.string.backhand_side);
 				shot_r.setText(R.string.forehand_side);
 			} else {
@@ -665,7 +665,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			if (left_hand == null)
 				left_hand = ((TextView) this.findViewById(R.id.left_hand));
 			
-			if ((near && rightHanded) || (!near && !righthand)) {
+			if (near == rightHanded) {
 				left_hand.setText(R.string.backhand);
 				right_hand.setText(R.string.forehand);
 			} else {
