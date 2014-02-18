@@ -25,6 +25,11 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 
+/**
+ * In-match dialog for various functions.
+ *
+ * TODO: rename.
+ */
 public class PointEndDialog extends DialogFragment {
 	private RadioGroup mServeEndGroup;
 	private RadioGroup mPointEndGroup;

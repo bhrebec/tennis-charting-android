@@ -21,8 +21,6 @@ import android.widget.ToggleButton;
 
 /**
  * Activity to create a match or edit an existing match's properties.
- * @author mrdog
- *
  */
 public class MatchInfoActivity extends Activity implements OnClickListener {
 

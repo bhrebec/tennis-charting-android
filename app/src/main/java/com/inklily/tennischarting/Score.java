@@ -4,8 +4,6 @@ import java.util.List;
 
 /**
  * Scorekeeping class.
- * @author mrdog
- *
  */
 public class Score {
     private final static String[] PTS_TABLE = {"0", "15", "30", "40", "Ad"};
@@ -131,6 +129,9 @@ public class Score {
 	 * @return
 	 */
 	public boolean in_tb() {
+        if (isComplete())
+            return false;
+
 		if (p1_games[mCurrentSet] == 6
 				&& p2_games[mCurrentSet] == 6
 				&& !(mCurrentSet == mSets - 1 && !mFinalTb)) {

@@ -1,8 +1,21 @@
 package com.inklily.tennischarting;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a single match. Tracks the points therein, and provides an interface for the scoring.
+ *
+ * TODO: write some tests for this.
+ */
 public class Match {
 	public Long id = null;
 	
@@ -191,5 +204,30 @@ public class Match {
             return player1;
         else
             return player2;
+    }
+
+    public Intent getSendIntent(Context context) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+
+        try {
+            String name = String.format("%s v %s - %s - %s", player1, player2, date, tournament);
+            File path = new File(Environment.getExternalStorageDirectory().getPath(), "tennis-charting");
+            File file = new File(path, (name).replaceAll("[^A-Za-z0-9 ]", "") + ".csv");
+            path.mkdirs();
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(outputSpreadsheet().getBytes());
+            fos.close();
+
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getResources().getString(R.string.submit_email_address)});
+            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("[Tennis Chart App] %s vs. %s", player1, player2));
+            intent.putExtra(Intent.EXTRA_TEXT, name + "\n\nCharted by " + charted_by);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return intent;
     }
 }

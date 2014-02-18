@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,14 +14,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by mrdog on 2/15/14.
+ * Activity to display and edit a Match.
  */
 public class MatchDetailActivity extends Activity implements MatchStorage.OnStorageAvailableListener {
     private SQLiteMatchStorage mStorage;
@@ -152,28 +147,14 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND);
-
-                try {
-                    String name = String.format("%s v %s - %s - %s", match.player1, match.player2, match.date, match.tournament);
-                    File path = new File(Environment.getExternalStorageDirectory().getPath(), "tennis-charting");
-                    File file = new File(path, (name + ".csv").replaceAll("[^A-Za-z0-9 ]", ""));
-                    path.mkdirs();
-                    FileOutputStream fos = new FileOutputStream(file);
-                    fos.write(match.outputSpreadsheet().getBytes());
-                    fos.close();
-
-                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.submit_email_address)});
-                    intent.putExtra(Intent.EXTRA_SUBJECT, String.format("[Tennis Chart App] %s vs. %s", match.player1, match.player2));
-                    intent.putExtra(Intent.EXTRA_TEXT, name + "\n\nCharted by " + match.charted_by);
-                    intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-
+                Intent intent = match.getSendIntent(MatchDetailActivity.this);
+                if (intent == null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MatchDetailActivity.this);
+                    builder.setMessage("Something went wrong, match not sent!");
+                    builder.show();
+                } else {
                     toMainActivity();
                     startActivity(intent);
-                } catch (IOException e) {
-                    // TODO: error
-                    e.printStackTrace();
                 }
             }
         });

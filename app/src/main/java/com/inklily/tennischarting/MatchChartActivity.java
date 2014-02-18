@@ -38,8 +38,8 @@ import android.widget.TextView;
  * SERVE -> STROKE -> POSITION
  *            |          |
  *            \----<<----/
- * 
- * @author mrdog
+ *
+ * TODO: review to ensure all the scoring logic has been removed. This class should be UI only.
  */
 public class MatchChartActivity extends FragmentActivity implements OnPointEndListener {
     /**

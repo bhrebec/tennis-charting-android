@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 /**
- * Created by mrdog on 2/15/14.
+ * Activity to display a list of matches.
  */
 public class MatchReviewActivity extends Activity implements MatchStorage.OnStorageAvailableListener {
     private SQLiteMatchStorage mStorage;

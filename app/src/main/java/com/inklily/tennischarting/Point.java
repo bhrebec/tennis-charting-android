@@ -4,6 +4,11 @@ import java.security.InvalidParameterException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a single point in chart form.
+ *
+ * TODO: the 'seq' item is pretty opaque/problematic. Fix it.
+ */
 public class Point {
 	public Integer seq;
 	private StringBuilder data;

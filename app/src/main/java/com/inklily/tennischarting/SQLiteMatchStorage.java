@@ -26,6 +26,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+/**
+ * SQLite implementation of match storage.
+ */
 public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private final static String DATABASE_NAME = "matches";
 	private final static int DB_VERSION_1 = 1;

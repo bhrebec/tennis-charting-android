@@ -2,6 +2,9 @@ package com.inklily.tennischarting;
 
 import android.widget.ListAdapter;
 
+/**
+ * Interface to manage storing matches.
+ */
 public interface MatchStorage extends ListAdapter {
 	public class MatchStorageNotAvailableException extends Exception {
 		private static final long serialVersionUID = 1L;
