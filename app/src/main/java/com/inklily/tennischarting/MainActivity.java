@@ -33,6 +33,7 @@ package com.inklily.tennischarting;
  *    b. Need better undo
  *    c. Need to have something for when a player receives a new first serve e.g. as
  *       a result of a hinderence.
+ *    d. Need to generate resources for all screen densities
  */
 
 import android.os.Bundle;
