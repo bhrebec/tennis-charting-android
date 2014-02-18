@@ -59,8 +59,17 @@ public class Score {
 		}
 		mCurrentSet = 0;
 	}
-	
-	public int games() {
+
+    private int changes() {
+        int c = 0;
+        for (int i = 0; i < p1_tbs.length; i++) {
+            c += (p1_games[i] + p2_games[i] + 1) / 2;
+            c += (p1_tbs[i] + p2_tbs[i]) / 6;
+        }
+        return c;
+    }
+
+    public int games() {
 		int c = 0;
 		int[][] arrays = { p1_games, p2_games };
 		for (int[] a : arrays) {
@@ -224,12 +233,11 @@ public class Score {
      * first receiver was far from the camera.
 	 */
 	public boolean near() {
-		boolean near = ((games() / 2) % 2) == 1;
-        // The TB pattern is tricky - it's: FNNFFN FNNFFN, etc.
-		if (in_tb() && ((((p1_pts + p2_pts) % 6) + 1) / 2 % 2 == 1))
-			return !near;
-		else
-			return near;
+        int c = changes();
+        if (in_tb())
+            c += (p1_pts + p2_pts) / 6;
+		int nearPlayer = c % 2 + 1;
+        return nearPlayer != server();
 	}
 
     public String gameScore() {

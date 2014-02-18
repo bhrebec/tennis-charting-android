@@ -46,7 +46,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
 	private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
-	private static final float TAP_MAX_DIST = 10.0f;
+	private static final float TAP_MAX_DIST = 15.0f;
 	private static final double SWINGING_VOLLEY_MAX = Math.toRadians(60.0);
 	private static final double SWINGING_VOLLEY_MIN = Math.toRadians(30.0);
 

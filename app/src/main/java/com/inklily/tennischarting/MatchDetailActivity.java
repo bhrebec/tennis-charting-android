@@ -8,15 +8,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mrdog on 2/15/14.
@@ -29,6 +33,7 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
     private ArrayAdapter<Point> point_adapter;
     private Button sendButton;
     private boolean review;
+    private List<String> mScores;
 
     @Override
     public void onStorageAvailable(MatchStorage storage) {
@@ -43,9 +48,29 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
         else
             sendButton.setText(R.string.send_processing);
 
-        point_adapter = new ArrayAdapter<Point>(this, android.R.layout.simple_list_item_1, match.points);
+        makeScores();
+
+        point_adapter = new ArrayAdapter<Point>(this, android.R.layout.simple_list_item_2, android.R.id.text1, match.points) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                ((TextView)v.findViewById(android.R.id.text1)).setText(match.points.get(position).toString());
+                ((TextView)v.findViewById(android.R.id.text2)).setText(mScores.get(position));
+                return v;
+            }
+        };
         point_list.setAdapter(point_adapter);
         updateTitle();
+    }
+
+    private void makeScores() {
+        mScores = new ArrayList<String>();
+
+        Score s = new Score(match.sets(), match.finalTb());
+        for (Point p : match.points) {
+            s.score_point(p);
+            mScores.add(s.toString());
+        }
     }
 
     public void updateTitle() {
@@ -94,6 +119,7 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
                     public void onClick(DialogInterface dialog, int which) {
                         p.setPoint(text.getText().toString());
                         match.rescore();
+                        makeScores();
                         try {
                             mStorage.savePoint(match, p);
                         } catch (MatchStorage.MatchStorageNotAvailableException e) {

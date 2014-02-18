@@ -310,6 +310,69 @@ public class ScoreTest extends TestCase {
         // 3-2
         addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
         assertFalse(score3.toString(), score3.near());
+
+        // 3-3
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+
+        // 4-3
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+
+        // 4-3
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+
+        // 5-3
+        addPointsFor(score3, 4, Point.PointGiven.POINT_RETURNER);
+        assertFalse(score3.toString(), score3.near());
+
+        // 6-3
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+
+        // 6-3 1-0
+        addPointsFor(score3, 4, Point.PointGiven.POINT_SERVER);
+        assertTrue(score3.toString(), score3.near());
+    }
+
+    public void testNearAfterTb1() {
+        addPointsFor(score3, 4*12, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 6, 1);
+        assertFalse(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 1, 1);
+        assertTrue(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 4, 1);
+        assertTrue(score3.toString(), score3.near());
+    }
+
+    public void testNearAfterTb2() {
+        addPointsFor(score3, 4*12, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 2, 1);
+        assertFalse(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 4, 1);
+        assertFalse(score3.toString(), score3.near());
+    }
+
+    public void testNearAfterTb3() {
+        addPointsFor(score3, 4*12, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsFor(score3, 6, Point.PointGiven.POINT_SERVER);
+        assertFalse(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 2, 1);
+        assertTrue(score3.toString(), score3.near());
+        addPointsForPlayer(score3, 4, 1);
+        assertTrue(score3.toString(), score3.near());
     }
 
     public void testNearTb() {
