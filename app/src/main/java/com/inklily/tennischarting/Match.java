@@ -212,7 +212,7 @@ public class Match {
         try {
             String name = String.format("%s v %s - %s - %s", player1, player2, date, tournament);
             File path = new File(Environment.getExternalStorageDirectory().getPath(), "tennis-charting");
-            File file = new File(path, (name).replaceAll("[^A-Za-z0-9 ]", "") + ".csv");
+            File file = new File(path, (name).replaceAll("[^A-Za-z0-9 -]", "") + ".csv");
             path.mkdirs();
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(outputSpreadsheet().getBytes());
