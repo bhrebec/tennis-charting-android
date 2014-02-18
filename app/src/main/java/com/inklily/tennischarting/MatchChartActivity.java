@@ -412,9 +412,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         disableInput = false;
         if (p != null) {
             currentPoint = p;
-            // If this is not a serve, reset to stroke selection
+            // Fix the UI in case the point has changed
             if (currentPoint.shotCount() > 0)
                 setState(State.STROKE);
+            else if (currentPoint.shotCount() == 0)
+                setState(State.SERVE);
         }
     }
 

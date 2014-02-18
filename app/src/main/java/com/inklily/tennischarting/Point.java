@@ -237,12 +237,12 @@ public class Point {
 
 		reopenPoint();
 		data.append(s.asChar());
-		if (dir != null)
-			data.append(dir.asChar());
         if (approach != null)
             data.append(approach.asChar());
         if (np != null)
             data.append(np.asChar());
+        if (dir != null)
+            data.append(dir.asChar());
 		if (d != null)
 			data.append(d.asChar());
 	}

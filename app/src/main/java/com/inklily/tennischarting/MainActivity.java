@@ -28,6 +28,8 @@ package com.inklily.tennischarting;
  * 8. Help
  * 9. Data model
  *    b. Test first serves
+ * 10. Other
+ *    a. Make sure we can pause/resume correctly while charting
  */
 
 import android.os.Bundle;

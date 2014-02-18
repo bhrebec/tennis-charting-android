@@ -8,7 +8,7 @@ import java.util.List;
  *
  */
 public class Score {
-    private final static String[] PTS_TABLE = {"0", "15", "30", "40"};
+    private final static String[] PTS_TABLE = {"0", "15", "30", "40", "Ad"};
 	private int[] p1_games;
 	private int[] p1_tbs;
 	private int[] p2_games;
@@ -187,7 +187,11 @@ public class Score {
 				new_game();
 			} else if (p2_pts > 3 && p2_pts - p1_pts > 1) {
 				new_game();
-			}
+			} else if (p1_pts > 4 || p2_pts > 4 || p1_pts == 4 && p2_pts == 4) {
+                // Deal with deuce games
+                p1_pts--;
+                p2_pts--;
+            }
 		}
 	}
 
