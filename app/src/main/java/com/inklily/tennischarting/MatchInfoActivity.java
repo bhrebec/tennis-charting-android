@@ -100,7 +100,8 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
 		m.player2 = ((TextView) findViewById(R.id.match_p2_name)).getText().toString();
         m.player1hand = ((RadioButton) findViewById(R.id.match_p1_right_handed)).isChecked() ? 'R' : 'L';
         m.player2hand = ((RadioButton) findViewById(R.id.match_p2_right_handed)).isChecked() ? 'R' : 'L';
-        
+        m.gender = ((RadioButton) findViewById(R.id.match_women)).isChecked() ? 'W' : 'M';
+
         DatePicker datep = ((DatePicker) findViewById(R.id.match_date));
         m.date = String.format("%04d-%02d-%02d", datep.getYear(), datep.getMonth(), datep.getDayOfMonth());
         
