@@ -152,7 +152,8 @@ public class Match {
     String outputRow(Point serve1, Point serve2) {
 		if (serve1 != null) {
 			// Output row
-			String comments = serve1.comments + (serve2 == null ? "" : serve2.comments);
+			String comments = serve1.comments.replace(",", "") +
+                    (serve2 == null ? "" : serve2.comments.replace(",", ""));
 			return String.format(",,,,,,,,%s,%s,%s\n", serve1, serve2 == null ? "" : serve2, comments);
 		}
 		return "";
@@ -162,7 +163,7 @@ public class Match {
 		StringBuilder output = new StringBuilder();
 		String[] players = { player1, player2 };
 		for (String player : players) {
-			output.append(",").append(player).append('\n');
+            output.append(",").append(player.replace(",", "")).append("\n");
 		}
 		
 		char[] player_info = { player1hand, player2hand, gender };
@@ -172,12 +173,12 @@ public class Match {
 		
 		String[] match_info = { date, tournament, round, time, court, surface, umpire};
 		for (String info : match_info) {
-			output.append(",").append(info).append('\n');
+            output.append(",").append(info.replace(",", "")).append("\n");
 		}
 
 		output.append(",").append(sets()).append('\n');
 		output.append(",").append(mFinalTb ? "1" : "0").append('\n');
-		output.append(",").append(mSets).append('\n');
+		output.append(",").append(charted_by.replace(",", "")).append('\n');
 		output.append(",\n,\n");
 		Point serve1 = null;
 		Point serve2 = null;

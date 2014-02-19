@@ -32,14 +32,15 @@ import android.widget.TextView;
 public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private final static String DATABASE_NAME = "matches";
 	private final static int DB_VERSION_1 = 1;
-	private final static int CURRENT_DB_VERSION = DB_VERSION_1;
+    private final static int DB_VERSION_2 = 2;
+	private final static int CURRENT_DB_VERSION = DB_VERSION_2;
     private final static SimpleDateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private final static String[] MATCH_COLS = { "_id", "player1", "player2" , "player1hand" ,
             "player2hand" ,	"date", "tournament", "round",
             "time", "court", "surface",	"umpire",
             "sets", "final_tb", "charted_by", "complete",
-            "near", "sent" };
+            "near", "sent", "gender" };
     private final Context context;
 
     private MatchSQLHelper helper;
@@ -95,6 +96,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion == DB_VERSION_1)
+                db.execSQL("ALTER TABLE match ADD COLUMN gender");
 		}
 	}
 	
@@ -179,6 +182,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		vals.put("player2", m.player2);
 		vals.put("player1hand", Character.toString(m.player1hand));
 		vals.put("player2hand", Character.toString(m.player2hand));
+        vals.put("gender", Character.toString(m.gender));
 		vals.put("date", m.date);
 		vals.put("tournament", m.tournament);
 		vals.put("round", m.round);
@@ -239,6 +243,13 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         m.umpire = c.getString(11);
         m.charted_by = c.getString(14);
         m.sent = c.getInt(17) != 0;
+        try {
+            m.gender = c.getString(18).charAt(0);
+        } catch (NullPointerException e) {
+            m.gender = 'W';
+        } catch (IndexOutOfBoundsException e) {
+            m.gender = 'W';
+        }
         return m;
     }
 	
