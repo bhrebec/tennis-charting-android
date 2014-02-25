@@ -4,7 +4,6 @@ package com.inklily.tennischarting;
  * ====
  *
  * 4. Point end screen
- *    a. Speculative scores
  *    b. Player wins game/set match
  * 5. Match review screen
  *    a. Score for each point

@@ -57,7 +57,7 @@ public class PointEndDialog extends DialogFragment {
             getPlayerDialog("Who won the point?", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if ((which + 1) == mPoint.server()) {
+                    if ((which + 1) == mMatch.server()) {
                         mPoint.givePoint(Point.PointGiven.POINT_SERVER);
                     } else {
                         mPoint.givePoint(Point.PointGiven.POINT_RETURNER);
@@ -120,7 +120,7 @@ public class PointEndDialog extends DialogFragment {
                 getPlayerDialog(R.string.penalty_prompt, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if ((which + 1) == mPoint.server())
+                        if ((which + 1) == mMatch.server())
                             mPoint.givePoint(Point.PointGiven.POINT_SERVER_PENALTY);
                         else
                             mPoint.givePoint(Point.PointGiven.POINT_RETURNER_PENALTY);
@@ -410,7 +410,7 @@ public class PointEndDialog extends DialogFragment {
         show(manager, tag);
 		mPoint = new Point(p);
         mMatch = m;
-        if (mPoint.server() == 1) {
+        if (mMatch.server() == 1) {
             mPlayers[0] = m.player1 + " " + "(server)";
             mPlayers[1] = m.player2 + " " + "(returner)";
         } else {
