@@ -13,7 +13,6 @@ public class Point {
 	public Integer seq;
 	private StringBuilder data;
 
-	private int mServer;
 	public String comments = "";
 	
 	// TODO: build these from the enums?
@@ -166,11 +165,13 @@ public class Point {
 		public String toString() { return Character.toString(value); }
     }
 
+    public enum PointWinner { NONE, SERVER, RETURNER }
+
 	/**
 	 * Copy constructor
 	 */
 	public Point(Point p) {
-		this(p.mServer, p.toString());
+		this(p.toString());
 		this.seq = p.seq;
 		this.comments = p.comments;
 	}
@@ -178,19 +179,16 @@ public class Point {
 	/**
 	 * Create an empty point.
 	 * 
-	 * @param server 1 or 2, the player who is serving
 	 */
-	public Point(int server) {
-		this(server, "");
+	public Point() {
+		this("");
 	}
 
 	/**
 	 * 
-	 * @param server 1 or 2, the player who is serving
 	 * @param point string representation of the point
 	 */
-	public Point(int server, String point) {
-		mServer = server;
+	public Point(String point) {
 		data = new StringBuilder(point);
 	}
 
@@ -281,21 +279,24 @@ public class Point {
 			data.append(et.asChar());
 		}
 	}
-	
-	public int winner() {
+
+    /**
+     * @return 1 if the server won the point, 2 if the returner, 0 if the point isn't over
+     */
+	public PointWinner winner() {
 		if (data.length() == 0 || !isValid())
-			return 0;
+			return PointWinner.NONE;
 
 		char first = data.charAt(0);
 		if (first == PointGiven.POINT_RETURNER.asChar() || first == PointGiven.POINT_RETURNER_PENALTY.asChar()) {
-			return returner();
+			return PointWinner.RETURNER;
 		} else if (first == PointGiven.POINT_SERVER.asChar() || first == PointGiven.POINT_SERVER_PENALTY.asChar()) {
-			return server();
+			return PointWinner.SERVER;
 		} else {
 			Matcher m = ENDING_PATTERN.matcher(data);
 			if (!m.find()) {
 				// Point isn't over
-				return 0;
+				return PointWinner.NONE;
 			}
 
 			int c = shotCount();
@@ -303,14 +304,14 @@ public class Point {
 			if (c == 1) {
 				if (outcome.equals(PointOutcome.ACE.toString()) || 
 						outcome.equals(PointOutcome.UNRETURNABLE.toString()))
-					return server();
+                    return PointWinner.SERVER;
 				else
-					return returner();
+                    return PointWinner.RETURNER;
 			} else {
 				if (outcome.equals(PointOutcome.WINNER.toString())) {
-					return c % 2 == 1 ? server() : returner();
-				} else { // Error
-					return c % 2 == 1 ? returner() : server();
+					return c % 2 == 1 ? PointWinner.SERVER : PointWinner.RETURNER;
+				} else { // Force or unforces error
+					return c % 2 == 1 ?  PointWinner.RETURNER : PointWinner.SERVER;
 				}
 			}
 		}
@@ -326,14 +327,6 @@ public class Point {
 			return SHOT_PATTERN.split(clean_data + " ").length; // Add a trailing space to correct points ending with a stroke
 	}
 
-	public int server() {
-		return mServer;
-	}
-	
-	public int returner() {
-		return mServer == 1 ? 2 : 1;
-	}
-	
 	public void setPoint(String point) {
 		data = new StringBuilder(point);
 	}
@@ -343,7 +336,7 @@ public class Point {
 	}
 	
 	public boolean isFault() {
-		return (winner() == returner() && shotCount() == 1);
+		return (winner() == PointWinner.RETURNER && shotCount() == 1);
 	}
 	
 	public boolean isValid() {
@@ -354,6 +347,6 @@ public class Point {
      * @return id of next player to strike the ball
      */
 	public int nextPlayer() {
-		return (shotCount() % 2) == 0 ? server() : returner();
+		return (shotCount() % 2) == 0 ? 1 : 2;
 	}
 }

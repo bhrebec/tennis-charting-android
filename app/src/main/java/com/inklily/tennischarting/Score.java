@@ -79,7 +79,7 @@ public class Score {
 	}
 	
 	/**
-	 * Returns the id of the server.
+	 * Returns the id (1 or 2) of the server.
 	 */
 	public int server() {
 		int server = games() % 2 + 1;
@@ -92,7 +92,14 @@ public class Score {
 		}
 		return server;
 	}
-	
+
+    /**
+     * Returns the id (1 or 2) of the returner.
+     */
+    public int returner() {
+        return server() == 1 ? 2 : 1;
+    }
+
 	/**
 	 * Adds a point to the score.
 	 * @param p point to score
@@ -102,9 +109,16 @@ public class Score {
 		if (mCurrentSet == mSets)
 			return false; // Match is over
 
-		int winner = p.winner();
-		if (winner == 0)
+		Point.PointWinner pointOutcome = p.winner();
+
+		if (pointOutcome == Point.PointWinner.NONE)
 			return false;
+
+        int winner;
+        if (pointOutcome == Point.PointWinner.SERVER)
+            winner = server();
+        else
+            winner = returner();
 
         // A first-serve fault doesn't affect the score
         if (p.isFault() && mFirstServe) {

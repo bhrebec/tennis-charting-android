@@ -174,7 +174,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	}
 	
 	private void newPoint() {
-		currentPoint = new Point(match.server());
+		currentPoint = new Point();
 	}
 
 	private void savePoint() {

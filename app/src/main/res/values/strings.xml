@@ -84,5 +84,6 @@
     <string name="serving_at">serve @</string>
     <string name="first">1st</string>
     <string name="second">2nd</string>
+    <string name="location_help_text">Tap for location, swipe left or right for unknown, up for net approach, down for non-standard location (groundstroke at the net, smash at the baseline, etc.)</string>
 
 </resources>

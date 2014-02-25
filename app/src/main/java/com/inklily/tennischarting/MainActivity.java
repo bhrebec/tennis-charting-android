@@ -3,10 +3,6 @@ package com.inklily.tennischarting;
  * TODO
  * ====
  *
- * 1. Serve screen
- *    b. Display 1st/2nd serve
- *    c. Net approach (up swipe)
- *    d. Unknown direction (LR swipe)
  * 2. Location screen
  *    a. Unknown direction (LR swipe)
  *    b. Net approach (up swipe)
