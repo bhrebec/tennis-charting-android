@@ -307,7 +307,9 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         float dX = mGestureStart.x  - mGestureEnd.x;
         float dY = mGestureStart.y  - mGestureEnd.y;
 
-        if (distance(dX, dY) > TAP_MAX_DIST) {
+        if (distance(dX, dY) < TAP_MAX_DIST) {
+            currentPoint.addStroke(currentStroke, direction);
+        } else { // Find a gesture
             double angle = angle(dX, dY);
             if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
                 currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
@@ -328,10 +330,9 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
                         currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_BASELINE);
                         break;
                 }
-                currentPoint.addStroke(currentStroke, Direction.UNKNOWN);
+            } else {
+                currentPoint.addStroke(currentStroke);
             }
-        } else {
-            currentPoint.addStroke(currentStroke, direction);
         }
 
 		Log.i("Shot", currentPoint.toString());
