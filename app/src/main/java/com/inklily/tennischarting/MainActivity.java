@@ -3,9 +3,6 @@ package com.inklily.tennischarting;
  * TODO
  * ====
  *
- * 2. Location screen
- *    a. Unknown direction (LR swipe)
- *    b. Net approach (up swipe)
  * 4. Point end screen
  *    a. Speculative scores
  *    b. Player wins game/set match

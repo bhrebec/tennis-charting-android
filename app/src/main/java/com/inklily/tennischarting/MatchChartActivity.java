@@ -61,6 +61,9 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     private static final double NET_APPROACH_MIN = Math.toRadians(45.0);
     private static final double NET_APPROACH_MAX = Math.toRadians(135.0);
 
+    private static final double ALT_STROKE_MIN = Math.toRadians(-135.0);
+    private static final double ALT_STROKE_MAX = Math.toRadians(-45.0);
+
 	private enum State {
 		SERVE,
 		LOCATION,
@@ -308,7 +311,23 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             double angle = angle(dX, dY);
             if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
                 currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
-            } else {
+            } else if (angle > ALT_STROKE_MIN && angle < ALT_STROKE_MAX) {
+                switch (currentStroke) {
+                    case FOREHAND_GROUNDSTROKE:
+                    case FOREHAND_LOB:
+                    case FOREHAND_DROPSHOT:
+                    case FOREHAND_SLICE:
+                    case BACKHAND_GROUNDSTROKE:
+                    case BACKHAND_LOB:
+                    case BACKHAND_DROPSHOT:
+                    case BACKHAND_SLICE:
+                    case TRICK:
+                        currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH, Point.NetPosition.AT_NET);
+                        break;
+                    default:
+                        currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH, Point.NetPosition.AT_BASELINE);
+                        break;
+                }
                 currentPoint.addStroke(currentStroke, Direction.UNKNOWN);
             }
         } else {
