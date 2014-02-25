@@ -252,4 +252,15 @@ public class Match {
         }
         return intent;
     }
+
+    /**
+     * Find a speculitive score.
+     * @param mPoint
+     * @return the score with the given point added.
+     */
+    public Score specScore(Point p) {
+        Score s = new Score(current_score);
+        s.score_point(p);
+        return s;
+    }
 }

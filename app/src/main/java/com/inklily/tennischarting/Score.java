@@ -1,5 +1,6 @@
 package com.inklily.tennischarting;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,8 +24,24 @@ public class Score {
 		setSets(sets);
 		setFinalTb(final_tb);
 	}
-	
-	public void setFinalTb(boolean t) {
+
+    /**
+     * Copy constructor
+     * @param score
+     */
+    public Score(Score score) {
+        this(score.mSets, score.mFinalTb);
+        System.arraycopy(score.p1_games, 0, this.p1_games, 0, score.p1_games.length);
+        System.arraycopy(score.p1_tbs, 0, this.p1_tbs, 0, score.p1_tbs.length);
+        System.arraycopy(score.p2_games, 0, this.p2_games, 0, score.p2_games.length);
+        System.arraycopy(score.p2_tbs, 0, this.p2_tbs, 0, score.p2_tbs.length);
+        this.p1_pts = score.p1_pts;
+        this.p2_pts = score.p2_pts;
+        this.mFirstServe = score.mFirstServe;
+        this.mCurrentSet = score.mCurrentSet;
+    }
+
+    public void setFinalTb(boolean t) {
 		mFinalTb = t;
 		reset_score();
 	}
@@ -295,5 +312,14 @@ public class Score {
 
     public boolean isFirstServe() {
         return mFirstServe;
+    }
+
+
+    public boolean isNewGame() {
+        return !isComplete() && p1_pts == 0 && p2_pts == 0;
+    }
+
+    public boolean isNewSet() {
+        return isNewGame() && !isComplete() && p1_games[mCurrentSet] == 0 && p2_games[mCurrentSet] == 0;
     }
 }

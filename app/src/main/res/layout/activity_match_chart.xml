@@ -222,16 +222,15 @@
             android:textSize="24sp" />
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="220dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/shot_mid_loc"
-            android:layout_marginTop="10dp"
+            android:layout_centerVertical="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/location_help_text"
             android:textColor="#ddd"
             android:singleLine="false"
-            android:id="@+id/textView"
             android:layout_gravity="center_vertical" />
 
     </view>

@@ -322,10 +322,10 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
                     case BACKHAND_DROPSHOT:
                     case BACKHAND_SLICE:
                     case TRICK:
-                        currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH, Point.NetPosition.AT_NET);
+                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_NET);
                         break;
                     default:
-                        currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH, Point.NetPosition.AT_BASELINE);
+                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_BASELINE);
                         break;
                 }
                 currentPoint.addStroke(currentStroke, Direction.UNKNOWN);

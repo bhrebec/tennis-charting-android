@@ -210,21 +210,37 @@ public class PointEndDialog extends DialogFragment {
 		}
 
 
+        Score score = mMatch.specScore(mPoint);
 		mNextPoint.setVisibility(View.VISIBLE);
-        int winner = 0;
-        if (mPoint.winner() == Point.PointWinner.SERVER)
-            winner = mMatch.server();
-        else if (mPoint.winner() == Point.PointWinner.RETURNER)
-            winner = mMatch.returner();
+        if (mPoint.isFault() && mMatch.score().isFirstServe()) {
+            mNextPoint.setText(getResources().getString(R.string.second_serve) + " "
+                    + mMatch.playerLastname(mMatch.server()));
+        } else {
+            int winner = 0;
+            if (mPoint.winner() == Point.PointWinner.SERVER)
+                winner = mMatch.server();
+            else if (mPoint.winner() == Point.PointWinner.RETURNER)
+                winner = mMatch.returner();
 
-        if (winner != 0)
-            mNextPoint.setText(getResources().getString(R.string.point) + " "
-                    + mMatch.playerLastname(winner));
-        else
-            mNextPoint.setText(R.string.next_point);
+            if (winner != 0) {
+                String name = mMatch.playerLastname(winner);
+                String msg;
+                if (score.isNewSet()) {
+                    msg = getResources().getString(R.string.set) + " " + name;
+                } else if (score.isNewGame()) {
+                    msg = getResources().getString(R.string.game) + " " + name;
+                } else  {
+                    msg = getResources().getString(R.string.point) + " " + name;
+                }
+
+                mNextPoint.setText(msg);
+            } else {
+                mNextPoint.setText(R.string.next_point);
+            }
+        }
 
 		mPointEditor.setText(mPoint.toString());
-        mScore.setText(mMatch.score().toString());
+        mScore.setText(score.toString());
         mScore.setTextColor(Color.GREEN);
 	}
 

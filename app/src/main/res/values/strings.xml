@@ -86,5 +86,8 @@
     <string name="second">2nd</string>
     <string name="location_help_text">Tap for location, swipe left or right for unknown, up for net approach, down for non-standard location (groundstroke at the net, smash at the baseline, etc.)</string>
     <string name="point">Point</string>
+    <string name="second_serve">2nd Serve</string>
+    <string name="game">Game</string>
+    <string name="set">Set</string>
 
 </resources>
