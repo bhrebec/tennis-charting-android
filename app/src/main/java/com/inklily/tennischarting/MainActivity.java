@@ -4,12 +4,12 @@ package com.inklily.tennischarting;
  * ====
  *
  * 5. Match review screen
- *    a. Score for each point
  *    b. Add point.
  *    c. Insert point
  *    d. Delete all matches
  * 6. New match screen
  *    a. Need to be able to access from review
+ *    b. Need to require player names to be entered
  *    c. Need to remove from stack after starting match
  * 7. Settings screen
  *    a. Strokes only

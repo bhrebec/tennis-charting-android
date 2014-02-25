@@ -91,7 +91,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
                     "sent DEFAULT (0), date_entered, " +
 					"PRIMARY KEY (_id))");
 			db.execSQL("CREATE TABLE IF NOT EXISTS point(match_id INTEGER, " +
-                    "seq INTEGER, point TEXT, server, UNIQUE(match_id, seq))");
+                    "seq INTEGER, point TEXT, UNIQUE(match_id, seq))");
 		}
 
 		@Override
@@ -166,7 +166,6 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		ContentValues vals = new ContentValues();
 		vals.put("match_id", m.id);
 		vals.put("seq", p.seq);
-		vals.put("server", p.server());
 		vals.put("point", p.toString());
         db.replace("point", null, vals);
 
@@ -266,11 +265,11 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         Match m = makeMatch(c);
         c.close();
 
- 		final String[] point_cols = { "match_id", "server", "seq", "point" };
+ 		final String[] point_cols = { "match_id", "seq", "point" };
  		Cursor pc = db.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
- 			Point p = new Point(pc.getInt(1), pc.getString(3));
- 			p.seq = pc.getInt(2);
+ 			Point p = new Point(pc.getString(2));
+ 			p.seq = pc.getInt(1);
  			m.addPoint(p);
  		}
         pc.close();
