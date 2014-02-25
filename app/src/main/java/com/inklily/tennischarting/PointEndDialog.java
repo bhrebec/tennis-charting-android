@@ -209,7 +209,6 @@ public class PointEndDialog extends DialogFragment {
 			mPoint.endPoint(o, et);
 		}
 
-
         Score score = mMatch.specScore(mPoint);
 		mNextPoint.setVisibility(View.VISIBLE);
         if (mPoint.isFault() && mMatch.score().isFirstServe()) {
@@ -225,7 +224,9 @@ public class PointEndDialog extends DialogFragment {
             if (winner != 0) {
                 String name = mMatch.playerLastname(winner);
                 String msg;
-                if (score.isNewSet()) {
+                if (score.isComplete()) {
+                    msg = getResources().getString(R.string.match) + " " + name;
+                } else if (score.isNewSet()) {
                     msg = getResources().getString(R.string.set) + " " + name;
                 } else if (score.isNewGame()) {
                     msg = getResources().getString(R.string.game) + " " + name;

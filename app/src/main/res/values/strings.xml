@@ -89,5 +89,6 @@
     <string name="second_serve">2nd Serve</string>
     <string name="game">Game</string>
     <string name="set">Set</string>
+    <string name="match">Match</string>
 
 </resources>
