@@ -70,8 +70,12 @@ public class Match {
 		return mSets;
 	}
 
-	public int server() {
-		return current_score.server();
+    public int server() {
+        return current_score.server();
+    }
+
+	public int returner() {
+		return current_score.returner();
 	}
 
 	public void setSets(int sets) {
@@ -205,6 +209,23 @@ public class Match {
             return player1;
         else
             return player2;
+    }
+
+    public String playerLastname(int i) {
+        String name = playerName(i);
+        String[] components = name.split(" ");
+        return components[components.length - 1];
+    }
+
+    public String playerInitials(int i) {
+        String name = playerName(i);
+        String[] components = name.split(" ");
+        StringBuilder initials = new StringBuilder();
+        for (String c : components) {
+            if (c.length() > 0)
+                initials.append(c.charAt(0));
+        }
+        return initials.toString();
     }
 
     public Intent getSendIntent(Context context) {

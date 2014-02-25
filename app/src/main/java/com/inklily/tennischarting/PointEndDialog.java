@@ -180,7 +180,8 @@ public class PointEndDialog extends DialogFragment {
         getPlayerDialog(getResources().getString(prompt), listener);
     }
 
-	private void getPlayerDialog(final String prompt, final DialogInterface.OnClickListener listener) {
+	private void getPlayerDialog(final String prompt,
+                                 final DialogInterface.OnClickListener listener) {
 		(new DialogFragment() {
 			@Override
 		    public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -210,7 +211,21 @@ public class PointEndDialog extends DialogFragment {
 
 
 		mNextPoint.setVisibility(View.VISIBLE);
+        int winner = 0;
+        if (mPoint.winner() == Point.PointWinner.SERVER)
+            winner = mMatch.server();
+        else if (mPoint.winner() == Point.PointWinner.RETURNER)
+            winner = mMatch.returner();
+
+        if (winner != 0)
+            mNextPoint.setText(getResources().getString(R.string.point) + " "
+                    + mMatch.playerLastname(winner));
+        else
+            mNextPoint.setText(R.string.next_point);
+
 		mPointEditor.setText(mPoint.toString());
+        mScore.setText(mMatch.score().toString());
+        mScore.setTextColor(Color.GREEN);
 	}
 
 	private void onErrorGroup() {
@@ -384,6 +399,7 @@ public class PointEndDialog extends DialogFragment {
 		mPointEditor.setText(mPoint.toString());
 		mPointEditor.invalidate();
         mScore.setText(mMatch.score().toString());
+        mScore.setTextColor(Color.WHITE);
 	}
 	
 	@Override

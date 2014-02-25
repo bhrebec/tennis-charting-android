@@ -3,8 +3,6 @@ package com.inklily.tennischarting;
  * TODO
  * ====
  *
- * 4. Point end screen
- *    b. Player wins game/set match
  * 5. Match review screen
  *    a. Score for each point
  *    b. Add point.
