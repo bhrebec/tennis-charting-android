@@ -90,5 +90,6 @@
     <string name="game">Game</string>
     <string name="set">Set</string>
     <string name="match">Match</string>
+    <string name="credits">Credits</string>
 
 </resources>

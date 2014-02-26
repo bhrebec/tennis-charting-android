@@ -26,4 +26,9 @@
         android:summaryOn="Forehand/Backhand always on same side"
         android:summaryOff="Forehand/Backhand matches player's handedness"
         />
+    <PreferenceCategory android:title="@string/credits" >
+        <Preference
+            android:summary="@string/photo_licenses"
+            />
+    </PreferenceCategory>
 </PreferenceScreen>
