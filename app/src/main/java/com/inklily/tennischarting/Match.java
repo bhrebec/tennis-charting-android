@@ -114,6 +114,18 @@ public class Match {
 		s.reScore(points.subList(0, before));
 		return s.toString();
 	}
+
+    /**
+     * Remove the first serve if this is a second serve.
+     */
+    public void replayPoint() {
+        if (points.size() == 0)
+            return;
+
+        Point lastPoint = points.get(points.size() - 1);
+        if (!score().isFirstServe())
+            points.remove(points.size() - 1);
+    }
 	
 	public Score score() {
 		return current_score;

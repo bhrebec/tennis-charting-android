@@ -25,6 +25,7 @@
         </activity>
         <activity
             android:name="com.inklily.tennischarting.MatchInfoActivity"
+            android:noHistory="true"
             android:label="@string/match_information" >
         </activity>
         <activity

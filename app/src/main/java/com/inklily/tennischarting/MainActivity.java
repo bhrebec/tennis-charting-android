@@ -10,8 +10,6 @@ package com.inklily.tennischarting;
  * 6. New match screen
  *    a. Need to be able to access from review
  *    b. Need to require player names to be entered
- *    c. Need to remove from stack after starting match
- * 8. Help
  * 9. Data model
  *    b. Test first serves
  * 10. Other

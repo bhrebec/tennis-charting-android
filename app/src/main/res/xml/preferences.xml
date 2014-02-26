@@ -28,7 +28,8 @@
         />
     <PreferenceCategory android:title="@string/credits" >
         <Preference
-            android:summary="@string/photo_licenses"
+            android:key="photo_credits"
+            android:title="@string/photocredits"
             />
     </PreferenceCategory>
 </PreferenceScreen>

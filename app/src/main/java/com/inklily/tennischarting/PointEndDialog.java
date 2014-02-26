@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -72,7 +73,8 @@ public class PointEndDialog extends DialogFragment {
 		public void onPointComplete(Point p);
 		public void onPointContinue(Point p);
         public void onMatchOver();
-	}
+        public void onReloadMatch();
+    }
 	
 	// Kludge workaround for android RadioButton bug #4785
 	private boolean mClearingErrors = false; 
@@ -95,6 +97,7 @@ public class PointEndDialog extends DialogFragment {
 	
 	
 	private ViewGroup mErrors;
+    private boolean mReloadMatch;
 	OnPointEndListener pointEndListener;
 
 	private OnClickListener mAddNoteListener = new OnClickListener() {
@@ -138,9 +141,14 @@ public class PointEndDialog extends DialogFragment {
                 });
             } else if (which == 2) { // Flip near court
                 mMatch.nearServerFirst = !mMatch.nearServerFirst;
-            } else if (which == 3) { // Flip near court
+            } else if (which == 3) { // Clear Point
                 mPoint.setPoint("");
                 continuePoint();
+            } else if (which == 4) { // Edit match info
+                Intent it = new Intent(PointEndDialog.this.getActivity(), MatchInfoActivity.class);
+                it.putExtra("match_id", mMatch.id);
+                startActivity(it);
+                mReloadMatch = true;
             }
         }
     };
@@ -153,7 +161,8 @@ public class PointEndDialog extends DialogFragment {
                 public Dialog onCreateDialog(Bundle savedInstanceState) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("More Options...");
-                    final String[] items = { "Point Penalty", "Retirement", "Flip Court Vertically", "Clear Current Point"};
+                    final String[] items = { "Point Penalty", "Retirement", "Flip Court Vertically", "Clear Current Point",
+                    "Edit Match Info"};
                     builder.setItems(items, mMoreDialogListener);
                     return builder.create();
                 }
@@ -374,6 +383,8 @@ public class PointEndDialog extends DialogFragment {
 	private void finishPoint() {
         if (editingPoint)
             mPoint.setPoint(mPointEditor.getText().toString());
+        if (mReloadMatch)
+            pointEndListener.onReloadMatch();
 		pointEndListener.onPointComplete(mPoint);
 		PointEndDialog.this.dismiss();
 	}
@@ -382,6 +393,8 @@ public class PointEndDialog extends DialogFragment {
         if (editingPoint)
             mPoint.setPoint(mPointEditor.getText().toString());
 		mPoint.reopenPoint();
+        if (mReloadMatch)
+            pointEndListener.onReloadMatch();
 		pointEndListener.onPointContinue(mPoint);
 		PointEndDialog.this.dismiss();
 	}
@@ -417,6 +430,7 @@ public class PointEndDialog extends DialogFragment {
 		mPointEditor.invalidate();
         mScore.setText(mMatch.score().toString());
         mScore.setTextColor(Color.WHITE);
+        mReloadMatch = false;
 	}
 	
 	@Override

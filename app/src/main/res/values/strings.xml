@@ -91,5 +91,7 @@
     <string name="set">Set</string>
     <string name="match">Match</string>
     <string name="credits">Credits</string>
+    <string name="save">Save</string>
+    <string name="photocredits">Photo Credits</string>
 
 </resources>

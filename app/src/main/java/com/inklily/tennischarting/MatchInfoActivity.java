@@ -22,7 +22,7 @@ import android.widget.ToggleButton;
 /**
  * Activity to create a match or edit an existing match's properties.
  */
-public class MatchInfoActivity extends Activity implements OnClickListener {
+public class MatchInfoActivity extends Activity implements OnClickListener, MatchStorage.OnStorageAvailableListener {
 
 	private SQLiteMatchStorage matchStorage;
 
@@ -31,6 +31,8 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
             R.id.match_charted_by,
             R.id.match_surface,
     };
+    private int mMatchId;
+    private Match mMatch;
 
     private void addAutocorrect(int id, ArrayAdapter<String> adapter) {
         AutoCompleteTextView v = (AutoCompleteTextView) findViewById(id);
@@ -65,7 +67,9 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+        Intent it = getIntent();
+        matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
+
 		setContentView(R.layout.activity_match_info);
 
 		String[] player_names = getResources().getStringArray(R.array.players_array);
@@ -79,14 +83,62 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
         addAutocorrect(R.id.match_tournament, R.array.tournament_array);
         addAutocorrect(R.id.match_surface, R.array.surface_array);
 
-        loadValues();
+        Button start = (Button) findViewById(R.id.match_start_charting);
+        start.setOnClickListener(this);
 
-		Button start = (Button) findViewById(R.id.match_start_charting);
-		start.setOnClickListener(this);
-		
-		matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
+        if (it.hasExtra("match_id")) {
+            mMatchId = it.getIntExtra("match_id", -1);
+            matchStorage.addOnStorageAvailableListener(this);
+            start.setText(getString(R.string.save));
+        } else {
+            mMatch = null;
+            loadValues();
+            start.setText(getString(R.string.start_charting));
+        }
 	}
-	
+
+    private void fromMatch(Match m) {
+        if (m.sets() == 3)
+            ((RadioButton) findViewById(R.id.match_three_sets)).setChecked(true);
+        else
+            ((RadioButton) findViewById(R.id.match_five_sets)).setChecked(true);
+        ((ToggleButton) findViewById(R.id.match_final_set_tb)).setChecked(m.finalTb());
+        ((ToggleButton) findViewById(R.id.match_first_serve_near)).setChecked(m.nearServerFirst);
+
+        ((TextView) findViewById(R.id.match_p1_name)).setText(m.player1);
+        ((TextView) findViewById(R.id.match_p2_name)).setText(m.player2);
+        if (m.player1hand == 'R')
+            ((RadioButton) findViewById(R.id.match_p1_right_handed)).setChecked(true);
+        else
+            ((RadioButton) findViewById(R.id.match_p1_left_handed)).setChecked(true);
+        if (m.player2hand == 'R')
+            ((RadioButton) findViewById(R.id.match_p2_right_handed)).setChecked(true);
+        else
+            ((RadioButton) findViewById(R.id.match_p2_left_handed)).setChecked(true);
+
+        if (m.gender == 'W')
+            ((RadioButton) findViewById(R.id.match_women)).setChecked(true);
+        else
+            ((RadioButton) findViewById(R.id.match_men)).setChecked(true);
+
+        DatePicker datep = ((DatePicker) findViewById(R.id.match_date));
+        datep.updateDate(Integer.parseInt(m.date.substring(0, 4)),
+                Integer.parseInt(m.date.substring(4, 6)),
+                Integer.parseInt(m.date.substring(6, 8)));
+
+        ((TextView) findViewById(R.id.match_tournament)).setText(m.tournament);
+        ((TextView) findViewById(R.id.match_round)).setText(m.round);
+
+        TimePicker timep = ((TimePicker) findViewById(R.id.match_time));
+        timep.setCurrentHour(Integer.parseInt(m.time.substring(0, 2)));
+        timep.setCurrentMinute(Integer.parseInt(m.time.substring(3, 5)));
+
+        ((TextView) findViewById(R.id.match_court)).setText(m.court);
+        ((TextView) findViewById(R.id.match_surface)).setText(m.surface);
+        ((TextView) findViewById(R.id.match_umpire)).setText(m.umpire);
+        ((TextView) findViewById(R.id.match_charted_by)).setText(m.charted_by);
+    }
+
 	private void updateMatch(Match m) {
 		int sets = ((RadioButton) findViewById(R.id.match_five_sets)).isChecked() ? 5 : 3;
 		boolean final_tb = ((ToggleButton) findViewById(R.id.match_final_set_tb)).isChecked();
@@ -103,7 +155,7 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
         m.gender = ((RadioButton) findViewById(R.id.match_women)).isChecked() ? 'W' : 'M';
 
         DatePicker datep = ((DatePicker) findViewById(R.id.match_date));
-        m.date = String.format("%04d-%02d-%02d", datep.getYear(), datep.getMonth(), datep.getDayOfMonth());
+        m.date = String.format("%04d%02d%02d", datep.getYear(), datep.getMonth(), datep.getDayOfMonth());
         
         m.tournament = ((TextView) findViewById(R.id.match_tournament)).getText().toString();
         m.round = ((TextView) findViewById(R.id.match_round)).getText().toString();
@@ -118,18 +170,39 @@ public class MatchInfoActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		Match m = new Match(3, true, true); // TODO: allow editing of existing match
+        Match m;
+        if (mMatch == null)
+		    m = new Match(3, true, true); // TODO: allow editing of existing match
+        else
+            m = mMatch;
+
 		updateMatch(m);
         saveValues();
-		
-		try {
-			matchStorage.saveMatch(m);
-			Intent it = new Intent(this, MatchChartActivity.class);
-			it.putExtra("match_id", m.id);
-			startActivity(it);
-		} catch (MatchStorageNotAvailableException e) {
-			e.printStackTrace(); // TODO: show error message
-		}
+        try {
+            matchStorage.saveMatch(m);
+
+            if (mMatch == null) {
+                Intent it = new Intent(this, MatchChartActivity.class);
+                it.putExtra("match_id", m.id);
+                startActivity(it);
+            } else {
+                onBackPressed();
+            }
+        } catch (MatchStorageNotAvailableException e) {
+            e.printStackTrace(); // TODO: show error message
+        }
 	}
 
+    @Override
+    public void onStorageAvailable(MatchStorage storage) {
+        if (mMatchId != -1) {
+            try {
+                mMatch = matchStorage.retrieveMatch(mMatchId);
+                fromMatch(mMatch);
+            } catch (MatchStorageNotAvailableException e) {
+                // TODO: bug da user
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -441,6 +441,15 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     }
 
     @Override
+    public void onReloadMatch() {
+        try {
+            match = matchStorage.retrieveMatch(match.id);
+        } catch (MatchStorageNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void onMatchOver() {
         savePoint();
         endMatch();
