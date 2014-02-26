@@ -13,7 +13,6 @@ package com.inklily.tennischarting;
  * 9. Data model
  *    b. Test first serves
  * 10. Other
- *    a. Make sure we can pause/resume correctly while charting
  *    b. Need better undo
  *    d. Need to generate resources for all screen densities
  */
