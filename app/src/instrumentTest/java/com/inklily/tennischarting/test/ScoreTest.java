@@ -42,8 +42,7 @@ public class ScoreTest extends TestCase {
 
     private void addPointsFor(Score score, int count, Point.PointGiven winner) {
         for (int i = 0; i < count; i++) {
-            int server = score.server();
-            Point p = new Point(server);
+            Point p = new Point();
             p.givePoint(winner);
 
             score.score_point(p);
@@ -53,7 +52,7 @@ public class ScoreTest extends TestCase {
     private void addPointsForPlayer(Score score, int count, int winner) {
         for (int i = 0; i < count; i++) {
             int server = score.server();
-            Point p = new Point(server);
+            Point p = new Point();
             if (server == winner)
                 p.givePoint(Point.PointGiven.POINT_SERVER);
             else
