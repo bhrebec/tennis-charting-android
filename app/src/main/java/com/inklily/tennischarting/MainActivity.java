@@ -57,6 +57,13 @@ public class MainActivity extends Activity {
 			}
 		});
 
+        findViewById(R.id.btn_help).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this, HelpActivity.class);
+                startActivity(it);
+            }
+        });
 		// Spin up the db to prevent delays
 		SQLiteMatchStorage.getGlobalInstance(this.getApplication());
 	}
