@@ -51,6 +51,30 @@ public class PointEndDialog extends DialogFragment {
     private TextView mScore;
     private boolean editingPoint;
 
+    private enum MoreMenu {
+        REPLAY("Replay the point"),
+        POINT_PENALTY("Point Penalty"),
+        RETIREMENT("Retirement"),
+        FLIP("Flip Court Vertically"),
+        CLEAR_RALLY("Clear Current Rally"),
+        EDIT_MATCH("Edit Match Info");
+
+        private String s;
+        MoreMenu(String s) {
+            this.s = s;
+        }
+        public String toString() {
+            return s;
+        }
+
+        static String[] string_array() {
+            MoreMenu[] vals = MoreMenu.values();
+            String[] returnVal = new String[vals.length];
+            for (int i = 0; i < vals.length; i++)
+                returnVal[i] = vals[i].toString();
+            return returnVal;
+        }
+    }
 
     View.OnClickListener mUnknownListener = new View.OnClickListener() {
         @Override
@@ -119,7 +143,7 @@ public class PointEndDialog extends DialogFragment {
     private DialogInterface.OnClickListener mMoreDialogListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            if (which == 0) { // Point Penalty
+            if (which == MoreMenu.POINT_PENALTY.ordinal()) { // Point Penalty
                 getPlayerDialog(R.string.penalty_prompt, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -130,7 +154,7 @@ public class PointEndDialog extends DialogFragment {
                         finishPoint();
                     }
                 });
-            } else if (which == 1) { // Retirement
+            } else if (which == MoreMenu.RETIREMENT.ordinal()) { // Retirement
                 getPlayerDialog(R.string.retired_prompt, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -139,12 +163,16 @@ public class PointEndDialog extends DialogFragment {
                         pointEndListener.onMatchOver();
                     }
                 });
-            } else if (which == 2) { // Flip near court
+            } else if (which == MoreMenu.FLIP.ordinal()) { // Flip near court
                 mMatch.nearServerFirst = !mMatch.nearServerFirst;
-            } else if (which == 3) { // Clear Point
+            } else if (which == MoreMenu.REPLAY.ordinal()) { // Replay the point
+                mMatch.replayPoint();
                 mPoint.setPoint("");
                 continuePoint();
-            } else if (which == 4) { // Edit match info
+            } else if (which == MoreMenu.CLEAR_RALLY.ordinal()) { // Clear Point
+                mPoint.setPoint("");
+                continuePoint();
+            } else if (which == MoreMenu.EDIT_MATCH.ordinal()) { // Edit match info
                 Intent it = new Intent(PointEndDialog.this.getActivity(), MatchInfoActivity.class);
                 it.putExtra("match_id", mMatch.id);
                 startActivity(it);
@@ -161,9 +189,7 @@ public class PointEndDialog extends DialogFragment {
                 public Dialog onCreateDialog(Bundle savedInstanceState) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("More Options...");
-                    final String[] items = { "Point Penalty", "Retirement", "Flip Court Vertically", "Clear Current Point",
-                    "Edit Match Info"};
-                    builder.setItems(items, mMoreDialogListener);
+                    builder.setItems(MoreMenu.string_array(), mMoreDialogListener);
                     return builder.create();
                 }
             }).show(getActivity().getSupportFragmentManager(), "more_dialog");
