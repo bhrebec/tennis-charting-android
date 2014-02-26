@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference android:key="record_shots"
+        android:defaultValue="true"
+        android:title="Record shot type"
+        android:summaryOn="Recording shots and locations"
+        android:summaryOff="Recording only shot type"
+        />
+    <CheckBoxPreference android:key="depth_return"
+        android:defaultValue="false"
+        android:title="Depth on return"
+        android:summaryOn="Recording depth on returns"
+        android:summaryOff="Not recording depth"
+        android:dependency="record_shots"
+        />
+    <CheckBoxPreference android:key="no_end_change"
+        android:defaultValue="false"
+        android:title="No Change of Ends"
+        android:summaryOn="Court end always from player's perspective"
+        android:summaryOff="Court end matches view on video screen"
+        />
+    <CheckBoxPreference android:key="no_handedness"
+        android:defaultValue="false"
+        android:title="No Handedness"
+        android:summaryOn="Forehand/Backhand always on same side"
+        android:summaryOff="Forehand/Backhand matches player's handedness"
+        />
+</PreferenceScreen>

@@ -11,10 +11,6 @@ package com.inklily.tennischarting;
  *    a. Need to be able to access from review
  *    b. Need to require player names to be entered
  *    c. Need to remove from stack after starting match
- * 7. Settings screen
- *    a. Strokes only
- *    b. Depth on return
- *    c. Depth everywhere
  * 8. Help
  * 9. Data model
  *    b. Test first serves
@@ -36,39 +32,34 @@ import android.view.View.OnClickListener;
 
 public class MainActivity extends Activity {
 
+    private class LaunchActivityListener implements OnClickListener {
+        private Class<? extends Activity> act;
+        public LaunchActivityListener(Class<? extends Activity> activity) {
+            this.act = activity;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent it = new Intent(MainActivity.this, act);
+            startActivity(it);
+        }
+    }
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        findViewById(R.id.btn_review_matches).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this, MatchReviewActivity.class);
-                startActivity(it);
-            }
-        });
+        findViewById(R.id.btn_review_matches).setOnClickListener(new LaunchActivityListener(MatchReviewActivity.class));
+		findViewById(R.id.btn_chart_new_match).setOnClickListener(new LaunchActivityListener(MatchInfoActivity.class));
+        findViewById(R.id.btn_help).setOnClickListener(new LaunchActivityListener(HelpActivity.class));
+        findViewById(R.id.btn_settings).setOnClickListener(new LaunchActivityListener(SettingsActivity.class));
 
-		findViewById(R.id.btn_chart_new_match).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent it = new Intent(MainActivity.this, MatchInfoActivity.class);
-				startActivity(it);
-			}
-		});
+        // Spin up the db to prevent delays
+        SQLiteMatchStorage.getGlobalInstance(this.getApplication());
+    }
 
-        findViewById(R.id.btn_help).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this, HelpActivity.class);
-                startActivity(it);
-            }
-        });
-		// Spin up the db to prevent delays
-		SQLiteMatchStorage.getGlobalInstance(this.getApplication());
-	}
-	
-	@Override
+    @Override
 	protected void onStop() {
 		super.onStop();
 	}

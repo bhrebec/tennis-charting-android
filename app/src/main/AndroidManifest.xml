@@ -37,6 +37,10 @@
             android:label="@string/help" >
         </activity>
         <activity
+            android:name="com.inklily.tennischarting.SettingsActivity"
+            android:label="@string/review_matches" >
+        </activity>
+        <activity
             android:name="com.inklily.tennischarting.MatchReviewActivity"
             android:label="@string/review_matches" >
         </activity>
