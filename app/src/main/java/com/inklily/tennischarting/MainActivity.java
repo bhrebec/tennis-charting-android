@@ -15,8 +15,6 @@ package com.inklily.tennischarting;
  * 10. Other
  *    a. Make sure we can pause/resume correctly while charting
  *    b. Need better undo
- *    c. Need to have something for when a player receives a new first serve e.g. as
- *       a result of a hinderence.
  *    d. Need to generate resources for all screen densities
  */
 

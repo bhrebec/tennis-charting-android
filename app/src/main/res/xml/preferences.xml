@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference android:key="record_shots"
+    <CheckBoxPreference android:key="record_shot_locations"
         android:defaultValue="true"
         android:title="Record shot type"
         android:summaryOn="Recording shots and locations"
@@ -12,7 +12,7 @@
         android:title="Depth on return"
         android:summaryOn="Recording depth on returns"
         android:summaryOff="Not recording depth"
-        android:dependency="record_shots"
+        android:dependency="record_shot_locations"
         />
     <CheckBoxPreference android:key="no_end_change"
         android:defaultValue="false"
@@ -24,7 +24,7 @@
         android:defaultValue="false"
         android:title="No Handedness"
         android:summaryOn="Forehand/Backhand always on same side"
-        android:summaryOff="Forehand/Backhand matches player's handedness"
+        android:summaryOff="Forehand/Backhand match players' handedness"
         />
     <PreferenceCategory android:title="@string/credits" >
         <Preference

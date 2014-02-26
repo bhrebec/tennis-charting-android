@@ -122,9 +122,9 @@ public class Match {
         if (points.size() == 0)
             return;
 
-        Point lastPoint = points.get(points.size() - 1);
         if (!score().isFirstServe())
             points.remove(points.size() - 1);
+        rescore();
     }
 	
 	public Score score() {

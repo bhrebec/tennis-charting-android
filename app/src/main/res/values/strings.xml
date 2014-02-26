@@ -93,5 +93,9 @@
     <string name="credits">Credits</string>
     <string name="save">Save</string>
     <string name="photocredits">Photo Credits</string>
+    <string name="replay_point">Replay the point (from 1st serve)</string>
+    <string name="flip_court">Flip Court Vertically</string>
+    <string name="clear_rally">Clear Current Rally</string>
+    <string name="edit_match_info">Edit Match Info</string>
 
 </resources>

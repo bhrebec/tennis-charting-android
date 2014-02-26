@@ -52,26 +52,26 @@ public class PointEndDialog extends DialogFragment {
     private boolean editingPoint;
 
     private enum MoreMenu {
-        REPLAY("Replay the point"),
-        POINT_PENALTY("Point Penalty"),
-        RETIREMENT("Retirement"),
-        FLIP("Flip Court Vertically"),
-        CLEAR_RALLY("Clear Current Rally"),
-        EDIT_MATCH("Edit Match Info");
+        REPLAY(R.string.replay_point),
+        POINT_PENALTY(R.string.point_penalty),
+        RETIREMENT(R.string.retirement),
+        FLIP(R.string.flip_court),
+        CLEAR_RALLY(R.string.clear_rally),
+        EDIT_MATCH(R.string.edit_match_info);
 
-        private String s;
-        MoreMenu(String s) {
-            this.s = s;
+        private int resId;
+        MoreMenu(int res) {
+            this.resId = res;
         }
-        public String toString() {
-            return s;
+        public String label(Context cxt) {
+            return cxt.getString(resId);
         }
 
-        static String[] string_array() {
+        static String[] labels(Context cxt) {
             MoreMenu[] vals = MoreMenu.values();
             String[] returnVal = new String[vals.length];
             for (int i = 0; i < vals.length; i++)
-                returnVal[i] = vals[i].toString();
+                returnVal[i] = vals[i].label(cxt);
             return returnVal;
         }
     }
@@ -189,7 +189,7 @@ public class PointEndDialog extends DialogFragment {
                 public Dialog onCreateDialog(Bundle savedInstanceState) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("More Options...");
-                    builder.setItems(MoreMenu.string_array(), mMoreDialogListener);
+                    builder.setItems(MoreMenu.labels(getActivity()), mMoreDialogListener);
                     return builder.create();
                 }
             }).show(getActivity().getSupportFragmentManager(), "more_dialog");
