@@ -33,21 +33,22 @@ public class Match {
 	public String court;
 	public String surface;
 	public String umpire;
+    public String charted_by;
+
 	private int mSets;
 	private boolean mFinalTb;
-	public String charted_by;
-    public boolean sent;
 
+    public boolean sent;
 	public boolean nearServerFirst; // true if first server is closest to the camera
 	
 	// Cache of the latest score
-	private Score current_score;
+	private Score mCurrentScore;
 
     public Match(int sets, boolean final_tb, boolean nearServerFirst) {
 		this.nearServerFirst = nearServerFirst;
 		this.mSets = sets;
 		this.mFinalTb = final_tb;
-		current_score = new Score(sets, final_tb);
+		mCurrentScore = new Score(sets, final_tb);
 		points = new ArrayList<Point>();
 	}
 	
@@ -59,11 +60,11 @@ public class Match {
      * @return true if next return stroke will be near the camera
      */
 	public boolean near() {
-		return current_score.near() ^ (!nearServerFirst);
+		return mCurrentScore.near() ^ (!nearServerFirst);
 	}
 	
 	public boolean deuceCourt() {
-		return current_score.deuceCourt();
+		return mCurrentScore.deuceCourt();
 	}
 	
 	public int sets() {
@@ -71,26 +72,26 @@ public class Match {
 	}
 
     public int server() {
-        return current_score.server();
+        return mCurrentScore.server();
     }
 
 	public int returner() {
-		return current_score.returner();
+		return mCurrentScore.returner();
 	}
 
 	public void setSets(int sets) {
-		current_score.setSets(sets);
-		current_score.reScore(points);
+		mCurrentScore.setSets(sets);
+		mCurrentScore.reScore(points);
 	}
 
 	public void setFinalTb(boolean ftb) {
 		mFinalTb = ftb;
-		current_score.setFinalTb(ftb);
-		current_score.reScore(points);
+		mCurrentScore.setFinalTb(ftb);
+		mCurrentScore.reScore(points);
 	}
 
 	public boolean isComplete() {
-		return current_score.isComplete();
+		return mCurrentScore.isComplete();
 	}
 
 	public boolean rightHanded(int player) {
@@ -102,7 +103,7 @@ public class Match {
 	public void addPoint(Point p) {
 		p.seq = points.size();
 		points.add(p);
-		current_score.score_point(p);
+		mCurrentScore.score_point(p);
 	}
 
     public void addPoint(Point p, MatchStorage storage) throws MatchStorage.MatchStorageNotAvailableException {
@@ -128,11 +129,11 @@ public class Match {
     }
 	
 	public Score score() {
-		return current_score;
+		return mCurrentScore;
 	}
 
     public void rescore() {
-        current_score.reScore(points);
+        mCurrentScore.reScore(points);
     }
 
     /**
@@ -271,7 +272,7 @@ public class Match {
      * @return the score with the given point added.
      */
     public Score specScore(Point p) {
-        Score s = new Score(current_score);
+        Score s = new Score(mCurrentScore);
         s.score_point(p);
         return s;
     }

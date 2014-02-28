@@ -3,6 +3,7 @@ package com.inklily.tennischarting;
 import com.inklily.tennischarting.MatchStorage.MatchStorageNotAvailableException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -33,6 +34,8 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
     };
     private int mMatchId;
     private Match mMatch;
+    private TextView mPlayer1Name;
+    private TextView mPlayer2Name;
 
     private void addAutocorrect(int id, ArrayAdapter<String> adapter) {
         AutoCompleteTextView v = (AutoCompleteTextView) findViewById(id);
@@ -83,6 +86,9 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
         addAutocorrect(R.id.match_tournament, R.array.tournament_array);
         addAutocorrect(R.id.match_surface, R.array.surface_array);
 
+        mPlayer1Name = (TextView) findViewById(R.id.match_p1_name);
+        mPlayer2Name = (TextView) findViewById(R.id.match_p2_name);
+
         Button start = (Button) findViewById(R.id.match_start_charting);
         start.setOnClickListener(this);
 
@@ -105,8 +111,8 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
         ((ToggleButton) findViewById(R.id.match_final_set_tb)).setChecked(m.finalTb());
         ((ToggleButton) findViewById(R.id.match_first_serve_near)).setChecked(m.nearServerFirst);
 
-        ((TextView) findViewById(R.id.match_p1_name)).setText(m.player1);
-        ((TextView) findViewById(R.id.match_p2_name)).setText(m.player2);
+        mPlayer1Name.setText(m.player1);
+        mPlayer2Name.setText(m.player2);
         if (m.player1hand == 'R')
             ((RadioButton) findViewById(R.id.match_p1_right_handed)).setChecked(true);
         else
@@ -148,8 +154,8 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
 		m.setSets(sets);
 		m.setFinalTb(final_tb);
 		
-		m.player1 = ((TextView) findViewById(R.id.match_p1_name)).getText().toString();
-		m.player2 = ((TextView) findViewById(R.id.match_p2_name)).getText().toString();
+		m.player1 = mPlayer1Name.getText().toString();
+		m.player2 = mPlayer2Name.getText().toString();
         m.player1hand = ((RadioButton) findViewById(R.id.match_p1_right_handed)).isChecked() ? 'R' : 'L';
         m.player2hand = ((RadioButton) findViewById(R.id.match_p2_right_handed)).isChecked() ? 'R' : 'L';
         m.gender = ((RadioButton) findViewById(R.id.match_women)).isChecked() ? 'W' : 'M';
@@ -170,6 +176,13 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
 
 	@Override
 	public void onClick(View arg0) {
+        if (mPlayer1Name.getText().length() == 0 && mPlayer2Name.getText().length() == 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setMessage(getString(R.string.player_name_warning));
+            return;
+        }
+
         Match m;
         if (mMatch == null)
 		    m = new Match(3, true, true); // TODO: allow editing of existing match

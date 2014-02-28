@@ -49,7 +49,7 @@ public class PointEndDialog extends DialogFragment {
 	private String[] mPlayers = new String[2];
     private Match mMatch;
     private TextView mScore;
-    private boolean editingPoint;
+    private boolean mEditingPoint;
 
     private enum MoreMenu {
         REPLAY(R.string.replay_point),
@@ -383,7 +383,7 @@ public class PointEndDialog extends DialogFragment {
                 mPointEndGroup.setVisibility(View.INVISIBLE);
                 mServeEndGroup.setVisibility(View.INVISIBLE);
                 mNextPoint.setVisibility(View.VISIBLE);
-                editingPoint = true;
+                mEditingPoint = true;
 			}
 		});
 		mPointEditor = (EditText) mRootView.findViewById(R.id.point_edit_box);
@@ -407,7 +407,7 @@ public class PointEndDialog extends DialogFragment {
 	}
 	
 	private void finishPoint() {
-        if (editingPoint)
+        if (mEditingPoint)
             mPoint.setPoint(mPointEditor.getText().toString());
         if (mReloadMatch)
             pointEndListener.onReloadMatch();
@@ -416,7 +416,7 @@ public class PointEndDialog extends DialogFragment {
 	}
 
 	private void continuePoint() {
-        if (editingPoint)
+        if (mEditingPoint)
             mPoint.setPoint(mPointEditor.getText().toString());
 		mPoint.reopenPoint();
         if (mReloadMatch)

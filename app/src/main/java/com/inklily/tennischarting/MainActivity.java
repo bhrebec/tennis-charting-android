@@ -7,13 +7,10 @@ package com.inklily.tennischarting;
  *    b. Add point.
  *    c. Insert point
  *    d. Delete all matches
- * 6. New match screen
- *    b. Need to require player names to be entered
  * 9. Data model
  *    b. Test first serves
  * 10. Other
  *    b. Need better undo
- *    d. Need to generate resources for all screen densities
  */
 
 import android.os.Bundle;

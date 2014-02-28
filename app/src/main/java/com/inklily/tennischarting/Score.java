@@ -1,6 +1,5 @@
 package com.inklily.tennischarting;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,12 +7,12 @@ import java.util.List;
  */
 public class Score {
     private final static String[] PTS_TABLE = {"0", "15", "30", "40", "Ad"};
-	private int[] p1_games;
-	private int[] p1_tbs;
-	private int[] p2_games;
-	private int[] p2_tbs;
-	private int p1_pts = 0;
-	private int p2_pts = 0;
+	private int[] mP1Games;
+	private int[] mP1Tbs;
+	private int[] mP2Games;
+	private int[] mP2Tbs;
+	private int mP1Pts = 0;
+	private int mP2Pts = 0;
 	private int mSets;
 	private boolean mFinalTb;
     private boolean mFirstServe = true;
@@ -31,12 +30,12 @@ public class Score {
      */
     public Score(Score score) {
         this(score.mSets, score.mFinalTb);
-        System.arraycopy(score.p1_games, 0, this.p1_games, 0, score.p1_games.length);
-        System.arraycopy(score.p1_tbs, 0, this.p1_tbs, 0, score.p1_tbs.length);
-        System.arraycopy(score.p2_games, 0, this.p2_games, 0, score.p2_games.length);
-        System.arraycopy(score.p2_tbs, 0, this.p2_tbs, 0, score.p2_tbs.length);
-        this.p1_pts = score.p1_pts;
-        this.p2_pts = score.p2_pts;
+        System.arraycopy(score.mP1Games, 0, this.mP1Games, 0, score.mP1Games.length);
+        System.arraycopy(score.mP1Tbs, 0, this.mP1Tbs, 0, score.mP1Tbs.length);
+        System.arraycopy(score.mP2Games, 0, this.mP2Games, 0, score.mP2Games.length);
+        System.arraycopy(score.mP2Tbs, 0, this.mP2Tbs, 0, score.mP2Tbs.length);
+        this.mP1Pts = score.mP1Pts;
+        this.mP2Pts = score.mP2Pts;
         this.mFirstServe = score.mFirstServe;
         this.mCurrentSet = score.mCurrentSet;
     }
@@ -58,15 +57,15 @@ public class Score {
 	public void setSets(int sets) {
 		mSets = sets;
 
-		p1_games = new int[sets];
-		p2_games = new int[sets];
-		p1_tbs = new int[sets];
-		p2_tbs = new int[sets];
+		mP1Games = new int[sets];
+		mP2Games = new int[sets];
+		mP1Tbs = new int[sets];
+		mP2Tbs = new int[sets];
 		reset_score();
 	}
 
 	private void reset_score() {
-		int[][] arrays = { p1_games, p2_games, p1_tbs, p2_tbs };
+		int[][] arrays = {mP1Games, mP2Games, mP1Tbs, mP2Tbs};
 		for (int[] a : arrays) {
 			for (int i = 0; i < a.length; i++) {
 				a[i] = 0;
@@ -77,16 +76,16 @@ public class Score {
 
     private int changes() {
         int c = 0;
-        for (int i = 0; i < p1_tbs.length; i++) {
-            c += (p1_games[i] + p2_games[i] + 1) / 2;
-            c += (p1_tbs[i] + p2_tbs[i]) / 6;
+        for (int i = 0; i < mP1Tbs.length; i++) {
+            c += (mP1Games[i] + mP2Games[i] + 1) / 2;
+            c += (mP1Tbs[i] + mP2Tbs[i]) / 6;
         }
         return c;
     }
 
     public int games() {
 		int c = 0;
-		int[][] arrays = { p1_games, p2_games };
+		int[][] arrays = {mP1Games, mP2Games};
 		for (int[] a : arrays) {
 			for (int i = 0; i < a.length; i++) {
 				c += a[i];
@@ -101,7 +100,7 @@ public class Score {
 	public int server() {
 		int server = games() % 2 + 1;
 		if (in_tb()) {
-			int pts = p1_pts + p2_pts;
+			int pts = mP1Pts + mP2Pts;
 			boolean alt = ((pts + 1) / 2) % 2 == 1;
 
 			if (alt)
@@ -146,9 +145,9 @@ public class Score {
         }
 
         if (winner == 1) {
-			p1_pts += 1;
+			mP1Pts += 1;
 		} else if (winner == 2) {
-			p2_pts += 1;
+			mP2Pts += 1;
 		}
 		
 		normalize_score();
@@ -163,8 +162,8 @@ public class Score {
         if (isComplete())
             return false;
 
-		if (p1_games[mCurrentSet] == 6
-				&& p2_games[mCurrentSet] == 6
+		if (mP1Games[mCurrentSet] == 6
+				&& mP2Games[mCurrentSet] == 6
 				&& !(mCurrentSet == mSets - 1 && !mFinalTb)) {
 			return true;
 		} else {
@@ -188,23 +187,23 @@ public class Score {
         // Save this, it can change as we change state
         boolean was_in_tb = in_tb();
 
-		if (p1_pts > p2_pts)
-			p1_games[mCurrentSet]++;
-		else if (p2_pts > p1_pts)
-			p2_games[mCurrentSet]++;
+		if (mP1Pts > mP2Pts)
+			mP1Games[mCurrentSet]++;
+		else if (mP2Pts > mP1Pts)
+			mP2Games[mCurrentSet]++;
 		else
 			return;
 
         if (was_in_tb) {
-            p1_tbs[mCurrentSet] = p1_pts;
-            p2_tbs[mCurrentSet] = p2_pts;
+            mP1Tbs[mCurrentSet] = mP1Pts;
+            mP2Tbs[mCurrentSet] = mP2Pts;
         }
 
-        p1_pts = 0;
-        p2_pts = 0;
+        mP1Pts = 0;
+        mP2Pts = 0;
 
-        int p1_game = p1_games[mCurrentSet];
-        int p2_game = p2_games[mCurrentSet];
+        int p1_game = mP1Games[mCurrentSet];
+        int p2_game = mP2Games[mCurrentSet];
         if (was_in_tb && (p1_game == 7 || p2_game == 7))
 			new_set();
 		else if ( (p1_game > 5 && p1_game - p2_game > 1) 
@@ -218,20 +217,20 @@ public class Score {
 	 */
 	private void normalize_score() {
 		if (in_tb()) {
-			if (p1_pts > 6 && p1_pts - p2_pts > 1) {
+			if (mP1Pts > 6 && mP1Pts - mP2Pts > 1) {
 				new_game();
-			} else if (p2_pts > 6 && p2_pts - p1_pts > 1) {
+			} else if (mP2Pts > 6 && mP2Pts - mP1Pts > 1) {
 				new_game();
 			}
 		} else {
-			if (p1_pts > 3 && p1_pts - p2_pts > 1) {
+			if (mP1Pts > 3 && mP1Pts - mP2Pts > 1) {
 				new_game();
-			} else if (p2_pts > 3 && p2_pts - p1_pts > 1) {
+			} else if (mP2Pts > 3 && mP2Pts - mP1Pts > 1) {
 				new_game();
-			} else if (p1_pts > 4 || p2_pts > 4 || p1_pts == 4 && p2_pts == 4) {
+			} else if (mP1Pts > 4 || mP2Pts > 4 || mP1Pts == 4 && mP2Pts == 4) {
                 // Deal with deuce games
-                p1_pts--;
-                p2_pts--;
+                mP1Pts--;
+                mP2Pts--;
             }
 		}
 	}
@@ -257,7 +256,7 @@ public class Score {
 	 * Returns true if serve is from the deuce court.
 	 */
 	public boolean deuceCourt() {
-		return ((p1_pts + p2_pts) % 2 == 0);
+		return ((mP1Pts + mP2Pts) % 2 == 0);
 	}
 
 	/**
@@ -267,7 +266,7 @@ public class Score {
 	public boolean near() {
         int c = changes();
         if (in_tb())
-            c += (p1_pts + p2_pts) / 6;
+            c += (mP1Pts + mP2Pts) / 6;
 		int nearPlayer = c % 2 + 1;
         return nearPlayer != server();
 	}
@@ -276,12 +275,12 @@ public class Score {
         StringBuilder score = new StringBuilder();
         int end = mCurrentSet == mSets ? mSets : mCurrentSet + 1;
         for (int i = 0; i < end; i++) {
-            int t1 = p1_tbs[i];
-            int t2 = p2_tbs[i];
+            int t1 = mP1Tbs[i];
+            int t2 = mP2Tbs[i];
             if (t1 != 0 || t2 != 0)
-                score.append(String.format("%s-%s(%s)", p1_games[i], p2_games[i], t1 < t2 ? t1 : t2));
+                score.append(String.format("%s-%s(%s)", mP1Games[i], mP2Games[i], t1 < t2 ? t1 : t2));
             else
-                score.append(String.format("%s-%s", p1_games[i], p2_games[i]));
+                score.append(String.format("%s-%s", mP1Games[i], mP2Games[i]));
             if (i != end - 1)
                 score.append(" ");
         }
@@ -295,11 +294,11 @@ public class Score {
             String p1_pts_str;
             String p2_pts_str;
             if (in_tb()) {
-                p1_pts_str = Integer.toString(p1_pts);
-                p2_pts_str = Integer.toString(p2_pts);
+                p1_pts_str = Integer.toString(mP1Pts);
+                p2_pts_str = Integer.toString(mP2Pts);
             } else {
-                p1_pts_str = PTS_TABLE[p1_pts];
-                p2_pts_str = PTS_TABLE[p2_pts];
+                p1_pts_str = PTS_TABLE[mP1Pts];
+                p2_pts_str = PTS_TABLE[mP2Pts];
             }
             if (server() == 1)
                 return (String.format("%s-%s", p1_pts_str, p2_pts_str));
@@ -316,10 +315,10 @@ public class Score {
 
 
     public boolean isNewGame() {
-        return !isComplete() && p1_pts == 0 && p2_pts == 0;
+        return !isComplete() && mP1Pts == 0 && mP2Pts == 0;
     }
 
     public boolean isNewSet() {
-        return isNewGame() && !isComplete() && p1_games[mCurrentSet] == 0 && p2_games[mCurrentSet] == 0;
+        return isNewGame() && !isComplete() && mP1Games[mCurrentSet] == 0 && mP2Games[mCurrentSet] == 0;
     }
 }

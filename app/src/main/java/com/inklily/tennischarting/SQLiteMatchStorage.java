@@ -1,8 +1,6 @@
 package com.inklily.tennischarting;
 
 import java.io.File;
-import java.sql.SQLClientInfoException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,14 +39,14 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
             "time", "court", "surface",	"umpire",
             "sets", "final_tb", "charted_by", "complete",
             "near", "sent", "gender" };
-    private final Context context;
+    private final Context mContext;
 
-    private MatchSQLHelper helper;
-    private SQLiteDatabase db;
+    private MatchSQLHelper mHelper;
+    private SQLiteDatabase mDb;
     private List<OnStorageAvailableListener> mAvailableListeners;
-    private CursorAdapter cursorAdapter;
+    private CursorAdapter mCursorAdapter;
 
-    private DataSetObserver cursorObserver = new DataSetObserver() {
+    private DataSetObserver mCursorObserver = new DataSetObserver() {
         @Override
         public void onChanged() {
             SQLiteMatchStorage.this.notifyDataSetInvalidated();
@@ -121,9 +119,9 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 	    	if (failure) {
                 // TODO: make a listener for this
             } else {
-                db = result;
-                cursorAdapter = matchCursorAdapterFactory();
-                cursorAdapter.registerDataSetObserver(cursorObserver);
+                mDb = result;
+                mCursorAdapter = matchCursorAdapterFactory();
+                mCursorAdapter.registerDataSetObserver(mCursorObserver);
                 Log.d("SQLMatchStorage", "Storage Available");
                 for (OnStorageAvailableListener l : mAvailableListeners)
                     l.onStorageAvailable(SQLiteMatchStorage.this);
@@ -133,29 +131,29 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 
 	public SQLiteMatchStorage(Context cxt) {
         mAvailableListeners = new ArrayList<OnStorageAvailableListener>();
-		helper = MatchSQLHelper.makeHelper(cxt);
-		new DBOpenAsync().execute(helper);
-		// db = helper.getWritableDatabase();
-        context = cxt;
+		mHelper = MatchSQLHelper.makeHelper(cxt);
+		new DBOpenAsync().execute(mHelper);
+		// mDb = helper.getWritableDatabase();
+        mContext = cxt;
 	}
 
     @Override
     public void addOnStorageAvailableListener(OnStorageAvailableListener listener) {
-        if (db == null)
+        if (mDb == null)
             mAvailableListeners.add(listener);
         else
             listener.onStorageAvailable(this);
     }
 
 	public void close() {
-		if (db != null)
-			db.close();
-		db = null;
+		if (mDb != null)
+			mDb.close();
+		mDb = null;
 	}
 	
 	@Override
 	public void savePoint(Match m, Point p) throws MatchStorageNotAvailableException {
-		if (db == null)
+		if (mDb == null)
 			throw new MatchStorageNotAvailableException();
 		if (p.seq == null)
 			throw new InvalidPointException();
@@ -167,14 +165,14 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		vals.put("match_id", m.id);
 		vals.put("seq", p.seq);
 		vals.put("point", p.toString());
-        db.replace("point", null, vals);
+        mDb.replace("point", null, vals);
 
         requeryAdapter();
 	}
 
 	@Override
 	public void saveMatch(Match m) throws MatchStorageNotAvailableException {
-		if (db == null)
+		if (mDb == null)
 			throw new MatchStorageNotAvailableException();
 		ContentValues vals = new ContentValues();
 		vals.put("player1", m.player1);
@@ -200,26 +198,26 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		if (m.id != null)
 			vals.put("_id", m.id);
 		
-		m.id = db.replace("match", null, vals);
-        cursorAdapter.notifyDataSetChanged();
+		m.id = mDb.replace("match", null, vals);
+        mCursorAdapter.notifyDataSetChanged();
 	}
 
     @Override
     public void deleteMatch(long id) throws MatchStorageNotAvailableException {
-        if (db == null)
+        if (mDb == null)
             throw new MatchStorageNotAvailableException();
 
         final String[] args = { Long.toString(id), };
-        db.delete("match", "_id = ? ", args);
-        db.delete("point", "match_id = ? ", args);
+        mDb.delete("match", "_id = ? ", args);
+        mDb.delete("point", "match_id = ? ", args);
 
         requeryAdapter();
     }
 
     public int getIncompleteMatchCount() throws MatchStorageNotAvailableException {
-		if (db == null)
+		if (mDb == null)
 			throw new MatchStorageNotAvailableException();
-		Cursor c = db.rawQuery("SELECT count(*) FROM match WHERE complete = 0", null);
+		Cursor c = mDb.rawQuery("SELECT count(*) FROM match WHERE complete = 0", null);
 		
 		c.moveToFirst();
 		return c.getInt(0);
@@ -253,12 +251,12 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     }
 	
 	public Match retrieveMatch(long id) throws MatchStorageNotAvailableException {
-		if (db == null)
+		if (mDb == null)
 			throw new MatchStorageNotAvailableException();
 		
 		final String[] args = { Long.toString(id), };
 		
-		Cursor c = db.query("match", MATCH_COLS, "_id = ?", args, null, null, null);
+		Cursor c = mDb.query("match", MATCH_COLS, "_id = ?", args, null, null, null);
 		if (!c.moveToFirst())
 			return null;
 
@@ -266,7 +264,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         c.close();
 
  		final String[] point_cols = { "match_id", "seq", "point" };
- 		Cursor pc = db.query("point", point_cols, "match_id = ?", args, null, null, null);
+ 		Cursor pc = mDb.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
  			Point p = new Point(pc.getString(2));
  			p.seq = pc.getInt(1);
@@ -279,46 +277,46 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 
     @Override
     public int getCount() {
-        if (db == null)
+        if (mDb == null)
             return 0;
 
-        return cursorAdapter.getCount();
+        return mCursorAdapter.getCount();
     }
 
     @Override
     public Object getItem(int position) {
-        if (db == null)
+        if (mDb == null)
             return null;
 
-        return cursorAdapter.getItem(position);
+        return mCursorAdapter.getItem(position);
     }
 
     @Override
     public long getItemId(int position) {
-        if (db == null)
+        if (mDb == null)
             return 0;
 
-        return cursorAdapter.getItemId(position);
+        return mCursorAdapter.getItemId(position);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (db == null)
+        if (mDb == null)
             return null;
 
-        return cursorAdapter.getView(position, convertView, parent);
+        return mCursorAdapter.getView(position, convertView, parent);
     }
 
     private Cursor query () {
-        return db.query("match", MATCH_COLS, null, null, null, null, "date_entered DESC");
+        return mDb.query("match", MATCH_COLS, null, null, null, null, "date_entered DESC");
     }
 
     private void requeryAdapter () {
-        cursorAdapter.swapCursor(query());
+        mCursorAdapter.swapCursor(query());
     }
 
     private MatchCursorAdapter matchCursorAdapterFactory () {
-        return new MatchCursorAdapter(context, query());
+        return new MatchCursorAdapter(mContext, query());
     }
 
     private class MatchCursorAdapter extends CursorAdapter {

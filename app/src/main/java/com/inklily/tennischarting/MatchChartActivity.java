@@ -17,7 +17,6 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -75,28 +74,28 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		STROKE,
 	}
 
-	private State current_state = State.SERVE;
+	private State mCurrentState = State.SERVE;
 
 	private PointF mGestureStart = new PointF();
 	private PointF mGestureEnd = new PointF();
 	private boolean mActiveGesture = false;
-	private boolean disableInput;
+	private boolean mDisableInput;
 
-	private Match match;
-	private Point currentPoint;
+	private Match mMatch;
+	private Point mCurrentPoint;
 
 	private SystemUiHider mSystemUiHider;
 
 	private GestureOverlay mGestureOverlay;
 
-	private GuideView shotGuide;
-	private ServeGuide serveGuide;
-	private LocationGuide locationGuide;
-	private View centerLegend;
+	private GuideView mShotGuide;
+	private ServeGuide mServeGuid;
+	private LocationGuide mLocationGuide;
+	private View mCenterLegend;
 
-    private Stroke currentStroke;
-    private SQLiteMatchStorage matchStorage;
-    private Handler handler;
+    private Stroke mCurrentStroke;
+    private SQLiteMatchStorage mMatchStorage;
+    private Handler mLongPressHandler;
 
 	private Runnable mLongPressRunnable = new Runnable() {
 		@Override
@@ -104,17 +103,17 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             Point p;
 
             // Add a partial point if necessary
-            if (current_state == State.LOCATION) {
-                p = new Point(currentPoint);
-                p.addStroke(currentStroke);
+            if (mCurrentState == State.LOCATION) {
+                p = new Point(mCurrentPoint);
+                p.addStroke(mCurrentStroke);
             } else {
-                p = currentPoint;
+                p = mCurrentPoint;
             }
-			disableInput = true;
+			mDisableInput = true;
 
             // TODO: DI this class for testing
             PointEndDialog pointEndDialog = new PointEndDialog();
-			pointEndDialog.show(match, p, getSupportFragmentManager(), "point_end");
+			pointEndDialog.show(mMatch, p, getSupportFragmentManager(), "point_end");
 			mActiveGesture = false;
 		}
 		
@@ -125,9 +124,9 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		handler = new Handler(getMainLooper());
-		matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
-		disableInput = false;
+		mLongPressHandler = new Handler(getMainLooper());
+		mMatchStorage = SQLiteMatchStorage.getGlobalInstance(this);
+		mDisableInput = false;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 		} else {
@@ -136,11 +135,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		setContentView(R.layout.activity_match_chart);
 
 		final ViewGroup contentView = (ViewGroup) findViewById(R.id.fullscreen_content);
-		shotGuide = (GuideView) findViewById(R.id.shot_guide);
-		locationGuide = (LocationGuide) findViewById(R.id.location_guide);
-		serveGuide = (ServeGuide) findViewById(R.id.serve_guide);
+		mShotGuide = (GuideView) findViewById(R.id.shot_guide);
+		mLocationGuide = (LocationGuide) findViewById(R.id.location_guide);
+		mServeGuid = (ServeGuide) findViewById(R.id.serve_guide);
 
-		centerLegend = findViewById(R.id.center_legend);
+		mCenterLegend = findViewById(R.id.center_legend);
 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -165,16 +164,16 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         if (savedInstanceState != null) {
             m_id = savedInstanceState.getLong("match_id");
             String current_state_string = savedInstanceState.getString("state");
-            if (current_state == null)
-                current_state = State.SERVE;
+            if (mCurrentState == null)
+                mCurrentState = State.SERVE;
             else
-                current_state = State.valueOf(current_state_string);
-            currentPoint = new Point(savedInstanceState.getString("current_point", ""));
+                mCurrentState = State.valueOf(current_state_string);
+            mCurrentPoint = new Point(savedInstanceState.getString("current_point", ""));
             String current_stroke_string = savedInstanceState.getString("current_stroke");
             if (current_stroke_string == null)
-                currentStroke = Stroke.UNKNOWN;
+                mCurrentStroke = Stroke.UNKNOWN;
             else
-                currentStroke = Stroke.valueOf(current_stroke_string);
+                mCurrentStroke = Stroke.valueOf(current_stroke_string);
         } else {
             Bundle extras = this.getIntent().getExtras();
             if (extras != null && extras.containsKey("match_id")) {
@@ -184,12 +183,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         }
 
         final Long initial_match_id = m_id;
-        matchStorage.addOnStorageAvailableListener(new MatchStorage.OnStorageAvailableListener() {
+        mMatchStorage.addOnStorageAvailableListener(new MatchStorage.OnStorageAvailableListener() {
             @Override
             public void onStorageAvailable(MatchStorage storage) {
                 if (initial_match_id != null) {
                     try {
-                        match = matchStorage.retrieveMatch(initial_match_id);
+                        mMatch = mMatchStorage.retrieveMatch(initial_match_id);
                         updateUI();
                     } catch (MatchStorageNotAvailableException e) {
                         // TODO Auto-generated catch block
@@ -204,44 +203,44 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     @Override
     protected void onPause() {
         super.onPause();
-        handler.removeCallbacks(mLongPressRunnable);
+        mLongPressHandler.removeCallbacks(mLongPressRunnable);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (match != null && match.id != null)
-            outState.putLong("match_id", match.id);
-        outState.putString("state", current_state.toString());
-        outState.putString("current_point", currentPoint.toString());
-        outState.putString("current_stroke", currentStroke.toString());
+        if (mMatch != null && mMatch.id != null)
+            outState.putLong("match_id", mMatch.id);
+        outState.putString("state", mCurrentState.toString());
+        outState.putString("current_point", mCurrentPoint.toString());
+        outState.putString("current_stroke", mCurrentStroke.toString());
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
-        if (disableInput)
+        if (mDisableInput)
             return false;
 
         if (action == MotionEvent.ACTION_DOWN) {
             mActiveGesture = true;
             mGestureEnd.x = mGestureStart.x = event.getX();
             mGestureEnd.y = mGestureStart.y = event.getY();
-            handler.postDelayed(mLongPressRunnable, 1000);
+            mLongPressHandler.postDelayed(mLongPressRunnable, 1000);
         } else if (action == MotionEvent.ACTION_UP) {
-            handler.removeCallbacks(mLongPressRunnable);
+            mLongPressHandler.removeCallbacks(mLongPressRunnable);
             mGestureEnd.x = event.getX();
             mGestureEnd.y = event.getY();
-            switch (current_state) {
+            switch (mCurrentState) {
                 case LOCATION:
-                    if (mPrefs.getBoolean("return_depth", false) && currentPoint.shotCount() == 1)
-                        recordStroke(locationGuide.getDirection(event.getX()),
-                                locationGuide.getDepth(event.getY()));
+                    if (mPrefs.getBoolean("return_depth", false) && mCurrentPoint.shotCount() == 1)
+                        recordStroke(mLocationGuide.getDirection(event.getX()),
+                                mLocationGuide.getDepth(event.getY()));
                     else
-                        recordStroke(locationGuide.getDirection(event.getX()), null);
+                        recordStroke(mLocationGuide.getDirection(event.getX()), null);
                     break;
                 case STROKE:
-                    currentStroke = detectStroke();
+                    mCurrentStroke = detectStroke();
 
                     // If we're not going to ask the user for the location,
                     // record it now.
@@ -249,7 +248,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
                         recordStroke(null);
                     break;
                 case SERVE:
-                    recordServe(serveGuide.getServeDirection(event.getX()));
+                    recordServe(mServeGuid.getServeDirection(event.getX()));
                     break;
                 default:
                     break;
@@ -273,26 +272,26 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
     @Override
     public void onPointComplete(Point p) {
-        disableInput = false;
-        currentPoint = p;
+        mDisableInput = false;
+        mCurrentPoint = p;
         savePoint();
-        this.current_state = State.SERVE;
+        this.mCurrentState = State.SERVE;
         updateUI();
     }
 
     @Override
     public void onPointContinue(Point p) {
-        disableInput = false;
+        mDisableInput = false;
         if (p != null) {
-            if (currentPoint.toString().equals(p.toString())) {
-                currentPoint = p;
+            if (mCurrentPoint.toString().equals(p.toString())) {
+                mCurrentPoint = p;
                 updateUI();
             } else {
-                currentPoint = p;
+                mCurrentPoint = p;
                 // The point has changed, Fix the UI
-                if (currentPoint.shotCount() > 0)
+                if (mCurrentPoint.shotCount() > 0)
                     setState(State.STROKE);
-                else if (currentPoint.shotCount() == 0)
+                else if (mCurrentPoint.shotCount() == 0)
                     setState(State.SERVE);
             }
         }
@@ -301,7 +300,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     @Override
     public void onReloadMatch() {
         try {
-            match = matchStorage.retrieveMatch(match.id);
+            mMatch = mMatchStorage.retrieveMatch(mMatch.id);
         } catch (MatchStorageNotAvailableException e) {
             e.printStackTrace();
         }
@@ -314,12 +313,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     }
 
 	private void newPoint() {
-		currentPoint = new Point();
+		mCurrentPoint = new Point();
 	}
 
 	private void savePoint() {
         try {
-            match.addPoint(currentPoint, matchStorage);
+            mMatch.addPoint(mCurrentPoint, mMatchStorage);
         } catch (MatchStorageNotAvailableException e) {
             // TODO: notify the user
             e.printStackTrace();
@@ -327,56 +326,56 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
         newPoint();
 
-        if (match.isComplete()) {
+        if (mMatch.isComplete()) {
             endMatch();
         }
 	}
 
     private void endMatch () {
         Intent intent = new Intent(this, MatchDetailActivity.class);
-        intent.putExtra("match_id", match.id);
+        intent.putExtra("match_id", mMatch.id);
         intent.putExtra("review", false);
         startActivity(intent);
     }
 
 
 	private void updateUI() {
-		serveGuide.setVisibility(View.INVISIBLE);
-		locationGuide.setVisibility(View.INVISIBLE);
-		shotGuide.setVisibility(View.INVISIBLE);
+		mServeGuid.setVisibility(View.INVISIBLE);
+		mLocationGuide.setVisibility(View.INVISIBLE);
+		mShotGuide.setVisibility(View.INVISIBLE);
 
-		switch (current_state) {
+		switch (mCurrentState) {
 		case SERVE:
-			serveGuide.setVisibility(View.VISIBLE);
-			serveGuide.setPoint(match, currentPoint, mPrefs);
+			mServeGuid.setVisibility(View.VISIBLE);
+			mServeGuid.setPoint(mMatch, mCurrentPoint, mPrefs);
 			break;
 		case STROKE:
-			shotGuide.setVisibility(View.VISIBLE);
-			shotGuide.setPoint(match, currentPoint, mPrefs);
+			mShotGuide.setVisibility(View.VISIBLE);
+			mShotGuide.setPoint(mMatch, mCurrentPoint, mPrefs);
 			break;
 		case LOCATION:
-			locationGuide.setVisibility(View.VISIBLE);
-			locationGuide.setPoint(match, currentPoint, mPrefs);
+			mLocationGuide.setVisibility(View.VISIBLE);
+			mLocationGuide.setPoint(mMatch, mCurrentPoint, mPrefs);
 			break;
 		}
 	}
 
     private void setState(State s) {
-        current_state = s;
+        mCurrentState = s;
         updateUI();
     }
 	
 	private void nextState() {
-		switch (current_state) {
+		switch (mCurrentState) {
 		case SERVE:
-            current_state = State.STROKE;
+            mCurrentState = State.STROKE;
 			break;
 		case LOCATION:
-            current_state = State.STROKE;
+            mCurrentState = State.STROKE;
 			break;
 		case STROKE:
             if (mPrefs.getBoolean("record_shot_locations", true))
-                current_state = State.LOCATION;
+                mCurrentState = State.LOCATION;
 			break;
 		}
 
@@ -391,12 +390,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         if (distance(dX, dY) > TAP_MAX_DIST) {
             double angle = angle(dX, dY);
             if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
-                currentPoint.serve(dir, Point.Approach.SERVE_AND_VOLLEY);
+                mCurrentPoint.serve(dir, Point.Approach.SERVE_AND_VOLLEY);
             } else {
-                currentPoint.serve(ServeDirection.UNKNOWN);
+                mCurrentPoint.serve(ServeDirection.UNKNOWN);
             }
         } else {
-            currentPoint.serve(dir);
+            mCurrentPoint.serve(dir);
         }
     }
 
@@ -414,13 +413,13 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         float dY = mGestureStart.y  - mGestureEnd.y;
 
         if (distance(dX, dY) < TAP_MAX_DIST) {
-            currentPoint.addStroke(currentStroke, direction, depth);
+            mCurrentPoint.addStroke(mCurrentStroke, direction, depth);
         } else { // Find a gesture
             double angle = angle(dX, dY);
             if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
-                currentPoint.addStroke(currentStroke, direction, depth, Point.Approach.NET_APPROACH);
+                mCurrentPoint.addStroke(mCurrentStroke, direction, depth, Point.Approach.NET_APPROACH);
             } else if (angle > ALT_STROKE_MIN && angle < ALT_STROKE_MAX) {
-                switch (currentStroke) {
+                switch (mCurrentStroke) {
                     case FOREHAND_GROUNDSTROKE:
                     case FOREHAND_LOB:
                     case FOREHAND_DROPSHOT:
@@ -430,18 +429,18 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
                     case BACKHAND_DROPSHOT:
                     case BACKHAND_SLICE:
                     case TRICK:
-                        currentPoint.addStroke(currentStroke, direction, depth, null, Point.NetPosition.AT_NET);
+                        mCurrentPoint.addStroke(mCurrentStroke, direction, depth, null, Point.NetPosition.AT_NET);
                         break;
                     default:
-                        currentPoint.addStroke(currentStroke, direction, depth, null, Point.NetPosition.AT_BASELINE);
+                        mCurrentPoint.addStroke(mCurrentStroke, direction, depth, null, Point.NetPosition.AT_BASELINE);
                         break;
                 }
             } else { // Unknown direction
-                currentPoint.addStroke(currentStroke);
+                mCurrentPoint.addStroke(mCurrentStroke);
             }
         }
 
-		Log.i("Shot", currentPoint.toString());
+		Log.i("Shot", mCurrentPoint.toString());
 
 		return true;
 	}
@@ -490,9 +489,9 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	private Point.Stroke detectStroke() {
 		float dX = mGestureStart.x  - mGestureEnd.x;
 		float dY = mGestureStart.y  - mGestureEnd.y;
-		boolean left = mGestureStart.x < centerLegend.getLeft();
-		boolean right = mGestureStart.x > centerLegend.getRight();
-		boolean rightForehand = shotGuide.isRightHanded();
+		boolean left = mGestureStart.x < mCenterLegend.getLeft();
+		boolean right = mGestureStart.x > mCenterLegend.getRight();
+		boolean rightForehand = mShotGuide.isRightHanded();
 
 		if (!right)
 			dX = -dX;
