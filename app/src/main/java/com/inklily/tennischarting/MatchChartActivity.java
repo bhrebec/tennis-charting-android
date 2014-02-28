@@ -418,7 +418,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         } else { // Find a gesture
             double angle = angle(dX, dY);
             if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
-                currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
+                currentPoint.addStroke(currentStroke, direction, depth, Point.Approach.NET_APPROACH);
             } else if (angle > ALT_STROKE_MIN && angle < ALT_STROKE_MAX) {
                 switch (currentStroke) {
                     case FOREHAND_GROUNDSTROKE:
@@ -430,13 +430,13 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
                     case BACKHAND_DROPSHOT:
                     case BACKHAND_SLICE:
                     case TRICK:
-                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_NET);
+                        currentPoint.addStroke(currentStroke, direction, depth, null, Point.NetPosition.AT_NET);
                         break;
                     default:
-                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_BASELINE);
+                        currentPoint.addStroke(currentStroke, direction, depth, null, Point.NetPosition.AT_BASELINE);
                         break;
                 }
-            } else {
+            } else { // Unknown direction
                 currentPoint.addStroke(currentStroke);
             }
         }
@@ -696,11 +696,13 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		private TextView shot_r = null;
         private boolean drawDepthGuides;
         private Paint mDepthPaint;
+        final float DEPTH_SHORT = 0.3f;
+        final float DEPTH_LONG = 0.7f;
 
         public LocationGuide(Context context, AttributeSet attrs) {
 			super(context, attrs);
             mDepthPaint = new Paint(mGuidePaint);
-            mDepthPaint.setColor(Color.rgb(200, 255, 200));
+            mDepthPaint.setColor(Color.rgb(255, 180, 180));
 		}
 
         @Override
@@ -709,6 +711,8 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
             if (prefs.getBoolean("return_depth", false) && point.shotCount() == 1) {
                 drawDepthGuides = true;
+            } else {
+                drawDepthGuides = false;
             }
 
 			if (shot_l == null)
@@ -725,24 +729,24 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 			}
 		}
 
-        public Point.Depth getDepth(float x) {
+        public Point.Depth getDepth(float y) {
             float h = (float)this.getHeight();
-            float g1x = h * 0.33f;
-            float g2x = h * 0.66f;
-            if (x >= g1x && x <= g2x) {
+            float g1y = h * DEPTH_SHORT;
+            float g2y = h * DEPTH_LONG;
+            if (y >= g1y && y <= g2y) {
                 return Point.Depth.MID;
             }
 
             if (locNear()) {
-                if (x < g1x)
+                if (y < g1y)
                     return Point.Depth.SHORT;
                 else
                     return Point.Depth.DEEP;
             } else {
-                if (x < g1x)
-                    return Point.Depth.SHORT;
-                else
+                if (y < g1y)
                     return Point.Depth.DEEP;
+                else
+                    return Point.Depth.SHORT;
             }
         }
 
@@ -808,10 +812,10 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
 			// Depth guides
             if (drawDepthGuides) {
-                float g1y = h * 0.33f;
-                float g2y = h * 0.66f;
-                canvas.drawLine(0.0f, g1y, w, g1y, mGuidePaint);
-                canvas.drawLine(0.0f, g2y, w, g2y, mGuidePaint);
+                float g1y = h * DEPTH_SHORT;
+                float g2y = h * DEPTH_LONG;
+                canvas.drawLine(0.0f, g1y, w, g1y, mDepthPaint);
+                canvas.drawLine(0.0f, g2y, w, g2y, mDepthPaint);
             }
 
             this.drawGuides(canvas);

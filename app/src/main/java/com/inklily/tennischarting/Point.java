@@ -140,7 +140,7 @@ public class Point {
 	}
 	
 	public enum Depth {
-        SHORT ('4'), MID ('5'), DEEP ('6'), UNKNOWN ('0');
+        SHORT ('7'), MID ('8'), DEEP ('9'), UNKNOWN ('0');
 		private char value;
 		private Depth(char v) { value = v; }
 		public char asChar() { return value; }
