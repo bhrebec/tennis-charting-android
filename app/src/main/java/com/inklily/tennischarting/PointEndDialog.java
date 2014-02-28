@@ -398,10 +398,17 @@ public class PointEndDialog extends DialogFragment {
 		Dialog dialog = super.onCreateDialog(savedInstanceState);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(180, 0, 0, 0)));
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		return dialog;
 	}
-	
+
+    @Override public void onStart() {
+        super.onStart();
+        Dialog d = getDialog();
+        if (d!=null){
+            d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        }
+    }
+
 	private void finishPoint() {
         if (mEditingPoint)
             mPoint.setPoint(mPointEditor.getText().toString());

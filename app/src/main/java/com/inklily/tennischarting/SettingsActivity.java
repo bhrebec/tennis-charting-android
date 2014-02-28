@@ -54,8 +54,8 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            findPreference("photo_credits").setOnPreferenceClickListener(new PhotoCreditsShower(getActivity()));
             addPreferencesFromResource(R.xml.preferences);
+            findPreference("photo_credits").setOnPreferenceClickListener(new PhotoCreditsShower(getActivity()));
         }
     }
 }
