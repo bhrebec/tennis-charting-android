@@ -87,17 +87,17 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 					"player1, player2 , player1hand , player2hand , " +
 					"date, tournament, round, time, court, surface, " +
 					"umpire, sets, final_tb, charted_by, complete, near, " +
-                    "sent DEFAULT (0), date_entered, " +
+                    "sent DEFAULT (0), date_entered, gender, " +
 					"PRIMARY KEY (_id))");
 			db.execSQL("CREATE TABLE IF NOT EXISTS point(match_id INTEGER, " +
-                    "seq INTEGER, point TEXT, UNIQUE(match_id, seq))");
+                    "seq INTEGER, point TEXT, comments, UNIQUE(match_id, seq))");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion == DB_VERSION_1)
+            if (oldVersion <= DB_VERSION_1)
                 db.execSQL("ALTER TABLE match ADD COLUMN gender");
-            if (oldVersion == DB_VERSION_2)
+            if (oldVersion <= DB_VERSION_2)
                 db.execSQL("ALTER TABLE point ADD COLUMN comments");
 		}
 	}

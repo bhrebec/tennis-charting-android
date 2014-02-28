@@ -2,6 +2,7 @@ package com.inklily.tennischarting;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -150,11 +151,17 @@ public class MatchDetailActivity extends Activity implements MatchStorage.OnStor
                 Intent intent = mMatch.getSendIntent(MatchDetailActivity.this);
                 if (intent == null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MatchDetailActivity.this);
-                    builder.setMessage("Something went wrong, mMatch not sent!");
+                    builder.setMessage(getString(R.string.match_send_prep_error));
                     builder.show();
                 } else {
                     toMainActivity();
-                    startActivity(intent);
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MatchDetailActivity.this);
+                        builder.setMessage(getString(R.string.email_error));
+                        builder.show();
+                    }
                 }
             }
         });

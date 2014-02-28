@@ -27,14 +27,14 @@ public class Point {
 			+ "(" + RALLY_PATTERN_STRING + ")*" + ENDING_PATTERN_STRING);
 
     public String getComments() {
-        return mComments;
+        if (mComments == null)
+            return "";
+        else
+            return mComments;
     }
 
     public void setComments(String comments) {
-        if (comments == null)
-            mComments = "";
-        else
-            mComments = comments;
+        mComments = comments;
     }
 
     public enum PointGiven {

@@ -99,5 +99,7 @@
     <string name="edit_match_info">Edit Match Info</string>
     <string name="player_name_warning">Both players must have a name!</string>
     <string name="edit_note">Edit Comment</string>
+    <string name="email_error">Please install an email client! (Alternately, the chart can be found in the tennis-charting/ directory.)</string>
+    <string name="match_send_prep_error">Something went wrong, match not sent! Is the external storage available?</string>
 
 </resources>

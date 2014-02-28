@@ -30,7 +30,7 @@
             android:label="@string/match_information" >
         </activity>
         <activity
-            android:theme="@android:style/Theme.Black"
+            android:theme="@style/AppDarkTheme"
             android:name="com.inklily.tennischarting.MatchDetailActivity"
             android:label="@string/review_matches" >
         </activity>
@@ -40,11 +40,11 @@
         </activity>
         <activity
             android:name="com.inklily.tennischarting.SettingsActivity"
-            android:label="@string/review_matches" >
+            android:label="@string/settings" >
         </activity>
         <activity
             android:name="com.inklily.tennischarting.MatchReviewActivity"
-            android:label="@string/settings" >
+            android:label="@string/review_matches" >
         </activity>
         <activity
             android:name="com.inklily.tennischarting.MatchChartActivity"

@@ -28,6 +28,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -47,7 +49,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     /**
 	 * The flags to pass to {@link SystemUiHider#getInstance}.
 	 */
-	private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
+	private static final int HIDER_FLAGS = SystemUiHider.FLAG_FULLSCREEN;
 	private static final float TAP_MAX_DIST = 15.0f;
 	private static final double SWINGING_VOLLEY_MAX = Math.toRadians(60.0);
 	private static final double SWINGING_VOLLEY_MIN = Math.toRadians(30.0);
@@ -67,6 +69,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
     private static final double ALT_STROKE_MAX = Math.toRadians(-45.0);
 
     private SharedPreferences mPrefs;
+    private ViewGroup contentView;
 
     private enum State {
 		SERVE,
@@ -134,7 +137,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		}
 		setContentView(R.layout.activity_match_chart);
 
-		final ViewGroup contentView = (ViewGroup) findViewById(R.id.fullscreen_content);
+		contentView = (ViewGroup) findViewById(R.id.fullscreen_content);
 		mShotGuide = (GuideView) findViewById(R.id.shot_guide);
 		mLocationGuide = (LocationGuide) findViewById(R.id.location_guide);
 		mServeGuid = (ServeGuide) findViewById(R.id.serve_guide);
@@ -150,12 +153,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		mGestureOverlay = new GestureOverlay(this);
 		contentView.addView(mGestureOverlay, params);
 
-		// Set up an instance of SystemUiHider to control the system UI for
-		// this activity.
-		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
-				HIDER_FLAGS);
-		mSystemUiHider.setup();
-		mSystemUiHider.hide();
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
@@ -206,6 +203,11 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         mLongPressHandler.removeCallbacks(mLongPressRunnable);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fullscreen();
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -311,6 +313,16 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         endMatch();
     }
 
+    private void fullscreen() {
+        // Do the fullscreenish thing
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            contentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
 	private void newPoint() {
 		mCurrentPoint = new Point();
 	}
@@ -339,6 +351,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
 
 	private void updateUI() {
+        fullscreen();
 		mServeGuid.setVisibility(View.INVISIBLE);
 		mLocationGuide.setVisibility(View.INVISIBLE);
 		mShotGuide.setVisibility(View.INVISIBLE);
