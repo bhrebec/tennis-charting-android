@@ -308,7 +308,6 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
     @Override
     public void onMatchOver() {
-        savePoint();
         endMatch();
     }
 

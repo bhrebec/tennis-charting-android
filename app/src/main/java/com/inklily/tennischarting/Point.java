@@ -13,7 +13,7 @@ public class Point {
 	public Integer seq;
 	private StringBuilder mData;
 
-	public String comments = "";
+	private String mComments = "";
 	
 	// TODO: build these from the enums?
 	private static final String VALID_SHOTS = "frvoulhjbszpymiktq";
@@ -26,7 +26,18 @@ public class Point {
 	private static final Pattern POINT_PATTERN = Pattern.compile("P|Q|R|S|" + SERVE_PATTERN_STRING 
 			+ "(" + RALLY_PATTERN_STRING + ")*" + ENDING_PATTERN_STRING);
 
-	public enum PointGiven {
+    public String getComments() {
+        return mComments;
+    }
+
+    public void setComments(String comments) {
+        if (comments == null)
+            mComments = "";
+        else
+            mComments = comments;
+    }
+
+    public enum PointGiven {
 		POINT_SERVER('S'),
 		POINT_RETURNER('R'),
 		POINT_SERVER_PENALTY('P'),
@@ -173,7 +184,7 @@ public class Point {
 	public Point(Point p) {
 		this(p.toString());
 		this.seq = p.seq;
-		this.comments = p.comments;
+		this.setComments(p.getComments());
 	}
 
 	/**

@@ -1,5 +1,16 @@
 apply plugin: 'android'
-
+gradle.taskGraph.whenReady { taskGraph ->
+  if(taskGraph.hasTask(':app:assembleRelease')) {
+      def keyfile = new String(System.console().readLine("\n\$ Enter keystore path: "))
+      def storepass = new String(System.console().readLine("\n\$ Enter keystore password: "))
+      def keyalias = new String(System.console().readLine("\n\$ Enter key alias: "))
+      def keypass = new String(System.console().readLine("\n\$ Enter key password: "))
+      android.signingConfigs.release.storeFile file(keyfile)
+      android.signingConfigs.release.storePassword storepass
+      android.signingConfigs.release.keyAlias keyalias
+      android.signingConfigs.release.keyPassword keypass
+  }
+}
 android {
     compileSdkVersion 18
     buildToolsVersion "19.0.1"
@@ -14,9 +25,12 @@ android {
 
     buildTypes {
         release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
+    }
+    signingConfigs {
+        release {}
     }
 }
 

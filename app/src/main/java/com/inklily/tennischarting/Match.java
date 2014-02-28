@@ -107,6 +107,8 @@ public class Match {
 	}
 
     public void addPoint(Point p, MatchStorage storage) throws MatchStorage.MatchStorageNotAvailableException {
+        if (p.toString().equals("") && p.getComments().equals(""))
+            return;
         addPoint(p);
         storage.savePoint(this, p);
     }
@@ -169,8 +171,8 @@ public class Match {
     String outputRow(Point serve1, Point serve2) {
 		if (serve1 != null) {
 			// Output row
-			String comments = serve1.comments.replace(",", "") +
-                    (serve2 == null ? "" : serve2.comments.replace(",", ""));
+			String comments = serve1.getComments().replace(",", "") +
+                    (serve2 == null ? "" : serve2.getComments().replace(",", ""));
 			return String.format(",,,,,,,,%s,%s,%s\n", serve1, serve2 == null ? "" : serve2, comments);
 		}
 		return "";
@@ -268,7 +270,7 @@ public class Match {
 
     /**
      * Find a speculitive score.
-     * @param mPoint
+     * @param p
      * @return the score with the given point added.
      */
     public Score specScore(Point p) {

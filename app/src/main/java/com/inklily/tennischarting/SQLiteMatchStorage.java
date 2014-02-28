@@ -31,7 +31,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
     private final static String DATABASE_NAME = "matches";
 	private final static int DB_VERSION_1 = 1;
     private final static int DB_VERSION_2 = 2;
-	private final static int CURRENT_DB_VERSION = DB_VERSION_2;
+    private final static int DB_VERSION_3 = 3;
+	private final static int CURRENT_DB_VERSION = DB_VERSION_3;
     private final static SimpleDateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private final static String[] MATCH_COLS = { "_id", "player1", "player2" , "player1hand" ,
@@ -96,6 +97,8 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (oldVersion == DB_VERSION_1)
                 db.execSQL("ALTER TABLE match ADD COLUMN gender");
+            if (oldVersion == DB_VERSION_2)
+                db.execSQL("ALTER TABLE point ADD COLUMN comments");
 		}
 	}
 	
@@ -164,6 +167,7 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
 		vals.put("match_id", m.id);
 		vals.put("seq", p.seq);
 		vals.put("point", p.toString());
+        vals.put("comments", p.getComments());
         mDb.replace("point", null, vals);
 
         requeryAdapter();
@@ -262,11 +266,12 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         Match m = makeMatch(c);
         c.close();
 
- 		final String[] point_cols = { "match_id", "seq", "point" };
+ 		final String[] point_cols = { "match_id", "seq", "point", "comments" };
  		Cursor pc = mDb.query("point", point_cols, "match_id = ?", args, null, null, null);
  		while (pc.moveToNext()) {
  			Point p = new Point(pc.getString(2));
  			p.seq = pc.getInt(1);
+            p.setComments(pc.getString(3));
  			m.addPoint(p);
  		}
         pc.close();

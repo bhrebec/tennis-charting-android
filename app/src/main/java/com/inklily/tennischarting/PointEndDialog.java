@@ -127,14 +127,19 @@ public class PointEndDialog extends DialogFragment {
 	private OnClickListener mAddNoteListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			(new DialogFragment() {
-				@Override
-			    public Dialog onCreateDialog(Bundle savedInstanceState) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-					builder.setTitle("Edit Note");
-					return builder.create();
-				}
-			}).show(getActivity().getSupportFragmentManager(), "player_dialog");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getActivity().getString(R.string.edit_note));
+            final EditText editor = new EditText(getActivity());
+            editor.setText(mPoint.getComments());
+            builder.setView(editor);
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mPoint.setComments(editor.getText().toString());
+                }
+            });
+            builder.setNegativeButton(android.R.string.cancel, null);
+            builder.show();
 		}
 	};
 
@@ -158,7 +163,7 @@ public class PointEndDialog extends DialogFragment {
                 getPlayerDialog(R.string.retired_prompt, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mPoint.comments += mPlayers[which] + " retired";
+                        mPoint.setComments(mPoint.getComments() + mPlayers[which] + " retired");
                         finishPoint();
                         pointEndListener.onMatchOver();
                     }
@@ -184,15 +189,10 @@ public class PointEndDialog extends DialogFragment {
     private OnClickListener mMoreListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            (new DialogFragment() {
-                @Override
-                public Dialog onCreateDialog(Bundle savedInstanceState) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("More Options...");
-                    builder.setItems(MoreMenu.labels(getActivity()), mMoreDialogListener);
-                    return builder.create();
-                }
-            }).show(getActivity().getSupportFragmentManager(), "more_dialog");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("More Options...");
+            builder.setItems(MoreMenu.labels(getActivity()), mMoreDialogListener);
+            builder.show();
         }
     };
 
@@ -217,15 +217,10 @@ public class PointEndDialog extends DialogFragment {
 
 	private void getPlayerDialog(final String prompt,
                                  final DialogInterface.OnClickListener listener) {
-		(new DialogFragment() {
-			@Override
-		    public Dialog onCreateDialog(Bundle savedInstanceState) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-				builder.setTitle(prompt);
-				builder.setItems(mPlayers, listener);
-				return builder.create();
-			}
-		}).show(getActivity().getSupportFragmentManager(), "player_dialog");
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(prompt);
+        builder.setItems(mPlayers, listener);
+        builder.show();
 	}
 	
 	private void onOutcomeChecked(int checkedId) {

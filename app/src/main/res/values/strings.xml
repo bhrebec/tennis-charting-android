@@ -67,7 +67,7 @@
     <string name="service_winner">Service Winner</string>
     <string name="fault">Fault</string>
     <string name="letchord">Letchord</string>
-    <string name="add_note">Add Note</string>
+    <string name="add_note">Edit Comment</string>
     <string name="retirement">Retirement</string>
     <string name="cancel_point">Continue Point</string>
     <string name="next_point">Next Point</string>
@@ -98,5 +98,6 @@
     <string name="clear_rally">Clear Current Rally</string>
     <string name="edit_match_info">Edit Match Info</string>
     <string name="player_name_warning">Both players must have a name!</string>
+    <string name="edit_note">Edit Comment</string>
 
 </resources>
