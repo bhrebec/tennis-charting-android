@@ -7,7 +7,7 @@
         android:summaryOn="Recording shots and locations"
         android:summaryOff="Recording only shot type"
         />
-    <CheckBoxPreference android:key="depth_return"
+    <CheckBoxPreference android:key="return_depth"
         android:defaultValue="false"
         android:title="Depth on return"
         android:summaryOn="Recording depth on returns"

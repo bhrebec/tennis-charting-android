@@ -69,24 +69,19 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 
     private SharedPreferences mPrefs;
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        updateUI();
-    }
-
     private enum State {
 		SERVE,
 		LOCATION,
 		STROKE,
 	}
-	
+
 	private State current_state = State.SERVE;
 
 	private PointF mGestureStart = new PointF();
 	private PointF mGestureEnd = new PointF();
 	private boolean mActiveGesture = false;
 	private boolean disableInput;
-	
+
 	private Match match;
 	private Point currentPoint;
 
@@ -129,7 +124,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		handler = new Handler(getMainLooper());
 		matchStorage = SQLiteMatchStorage.getGlobalInstance(this);
 		disableInput = false;
@@ -169,9 +164,17 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         Long m_id = null;
         if (savedInstanceState != null) {
             m_id = savedInstanceState.getLong("match_id");
-            current_state = State.valueOf(savedInstanceState.getString("state", State.SERVE.toString()));
+            String current_state_string = savedInstanceState.getString("state");
+            if (current_state == null)
+                current_state = State.SERVE;
+            else
+                current_state = State.valueOf(current_state_string);
             currentPoint = new Point(savedInstanceState.getString("current_point", ""));
-            currentStroke = Stroke.valueOf(savedInstanceState.getString("current_stroke", Stroke.UNKNOWN.toString()));
+            String current_stroke_string = savedInstanceState.getString("current_stroke");
+            if (current_stroke_string == null)
+                currentStroke = Stroke.UNKNOWN;
+            else
+                currentStroke = Stroke.valueOf(current_stroke_string);
         } else {
             Bundle extras = this.getIntent().getExtras();
             if (extras != null && extras.containsKey("match_id")) {
@@ -197,257 +200,76 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
             }
         });
 	}
-	
-	private void newPoint() {
-		currentPoint = new Point();
-	}
-
-	private void savePoint() {
-        try {
-            match.addPoint(currentPoint, matchStorage);
-        } catch (MatchStorageNotAvailableException e) {
-            // TODO: notify the user
-            e.printStackTrace();
-        }
-
-        newPoint();
-
-        if (match.isComplete()) {
-            endMatch();
-        }
-	}
-
-    private void endMatch () {
-        Intent intent = new Intent(this, MatchDetailActivity.class);
-        intent.putExtra("match_id", match.id);
-        intent.putExtra("review", false);
-        startActivity(intent);
-    }
-
-	
-	private void updateUI() {
-		serveGuide.setVisibility(View.INVISIBLE);
-		locationGuide.setVisibility(View.INVISIBLE);
-		shotGuide.setVisibility(View.INVISIBLE);
-
-		switch (current_state) {
-		case SERVE:
-			serveGuide.setVisibility(View.VISIBLE);
-			serveGuide.setPoint(match, currentPoint, mPrefs);
-			break;
-		case STROKE:
-			shotGuide.setVisibility(View.VISIBLE);
-			shotGuide.setPoint(match, currentPoint, mPrefs);
-			break;
-		case LOCATION:
-			locationGuide.setVisibility(View.VISIBLE);
-			locationGuide.setPoint(match, currentPoint, mPrefs);
-			break;
-		}
-	}
-
-    private void setState(State s) {
-        current_state = s;
-        updateUI();
-    }
-	
-	private void nextState() {
-		switch (current_state) {
-		case SERVE:
-            current_state = State.STROKE;
-			break;
-		case LOCATION:
-            current_state = State.STROKE;
-			break;
-		case STROKE:
-            if (mPrefs.getBoolean("record_shot_locations", true))
-                current_state = State.LOCATION;
-			break;
-		}
-		
-		updateUI();
-	}
-	
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		int action = event.getAction();
-		if (disableInput)
-			return false;
-
-		if (action == MotionEvent.ACTION_DOWN) {
-            mActiveGesture = true;
-            mGestureEnd.x = mGestureStart.x = event.getX();
-            mGestureEnd.y = mGestureStart.y = event.getY();
-            handler.postDelayed(mLongPressRunnable, 1000);
-		} else if (action == MotionEvent.ACTION_UP) {
-			handler.removeCallbacks(mLongPressRunnable);
-            mGestureEnd.x = event.getX();
-            mGestureEnd.y = event.getY();
-			switch (current_state) {
-			case LOCATION:
-				recordStroke(locationGuide.getDirection(event.getX()));
-				break;
-			case STROKE:
-				currentStroke = detectStroke();
-
-                // If we're not going to ask the user for the location,
-                // record it now.
-                if (!mPrefs.getBoolean("record_shot_locations", true))
-                    recordStroke(null);
-				break;
-			case SERVE:
-                recordServe(serveGuide.getServeDirection(event.getX()));
-				break;
-			default:
-				break;
-			}
-            mActiveGesture = false;
-			nextState();
-		} else if (action == MotionEvent.ACTION_MOVE) {
-            mGestureEnd.x = event.getX();
-            mGestureEnd.y = event.getY();
-            mGestureOverlay.invalidate();
-		} else {
-			return super.onTouchEvent(event);
-		}
-		return false;
-	}
 
     @Override
-	protected void onPause() {
-		super.onPause();
-		handler.removeCallbacks(mLongPressRunnable);
-	}
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(mLongPressRunnable);
+    }
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         if (match != null && match.id != null)
             outState.putLong("match_id", match.id);
         outState.putString("state", current_state.toString());
         outState.putString("current_point", currentPoint.toString());
         outState.putString("current_stroke", currentStroke.toString());
-	}
-
-	/**
-	 * Records the stroke based on the current gesture.
-	 * @param direction direction of the stroke
-	 */
-	private boolean recordStroke(Direction direction) {
-        float dX = mGestureStart.x  - mGestureEnd.x;
-        float dY = mGestureStart.y  - mGestureEnd.y;
-
-        if (distance(dX, dY) < TAP_MAX_DIST) {
-            currentPoint.addStroke(currentStroke, direction);
-        } else { // Find a gesture
-            double angle = angle(dX, dY);
-            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
-                currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
-            } else if (angle > ALT_STROKE_MIN && angle < ALT_STROKE_MAX) {
-                switch (currentStroke) {
-                    case FOREHAND_GROUNDSTROKE:
-                    case FOREHAND_LOB:
-                    case FOREHAND_DROPSHOT:
-                    case FOREHAND_SLICE:
-                    case BACKHAND_GROUNDSTROKE:
-                    case BACKHAND_LOB:
-                    case BACKHAND_DROPSHOT:
-                    case BACKHAND_SLICE:
-                    case TRICK:
-                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_NET);
-                        break;
-                    default:
-                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_BASELINE);
-                        break;
-                }
-            } else {
-                currentPoint.addStroke(currentStroke);
-            }
-        }
-
-		Log.i("Shot", currentPoint.toString());
-		
-		return true;
-	}
-
-	private Point.Stroke detectCenterStroke(double distance, double angle) {
-
-		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
-			return Point.Stroke.UNKNOWN;
-
-		if (angle > TRICK_ANGLE || angle < -TRICK_ANGLE)
-			return Point.Stroke.TRICK;
-		else if (angle > 0)
-			return Point.Stroke.FOREHAND_OVERHEAD;
-		else
-			return Point.Stroke.BACKHAND_OVERHEAD;
-	}
-
-    private static double distance(float dX, float dY) {
-        return Math.sqrt(dX*dX + dY*dY);
     }
 
-    private static double angle(float dX, float dY) {
-        return Math.atan2(dY, dX);
-    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getAction();
+        if (disableInput)
+            return false;
 
-	private Point.Stroke detectStroke(Point.StrokeIndex index, double distance, double angle) {
-		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
-			return index.GROUNDSTROKE;
-		
-		if (angle > LOB_MAX || angle < DROP_MIN)
-			return index.SLICE;
-		if (angle > SWINGING_VOLLEY_MAX)
-			return index.LOB;
-		if (angle > SWINGING_VOLLEY_MIN)
-			return index.SWINGINGVOLLEY;
-		if (angle > HALF_VOLLEY_MAX)
-			return index.VOLLEY;
-		if (angle > HALF_VOLLEY_MIN)
-			return index.HALFVOLLEY;
-		if (angle > DROP_MIN)
-			return index.DROPSHOT;
+        if (action == MotionEvent.ACTION_DOWN) {
+            mActiveGesture = true;
+            mGestureEnd.x = mGestureStart.x = event.getX();
+            mGestureEnd.y = mGestureStart.y = event.getY();
+            handler.postDelayed(mLongPressRunnable, 1000);
+        } else if (action == MotionEvent.ACTION_UP) {
+            handler.removeCallbacks(mLongPressRunnable);
+            mGestureEnd.x = event.getX();
+            mGestureEnd.y = event.getY();
+            switch (current_state) {
+                case LOCATION:
+                    if (mPrefs.getBoolean("return_depth", false) && currentPoint.shotCount() == 1)
+                        recordStroke(locationGuide.getDirection(event.getX()),
+                                locationGuide.getDepth(event.getY()));
+                    else
+                        recordStroke(locationGuide.getDirection(event.getX()), null);
+                    break;
+                case STROKE:
+                    currentStroke = detectStroke();
 
-		return Point.Stroke.UNKNOWN;
-	}
-
-	private Point.Stroke detectStroke() {
-		float dX = mGestureStart.x  - mGestureEnd.x;
-		float dY = mGestureStart.y  - mGestureEnd.y;
-		boolean left = mGestureStart.x < centerLegend.getLeft();
-		boolean right = mGestureStart.x > centerLegend.getRight();
-		boolean rightForehand = shotGuide.isRightHanded();
-		
-		if (!right)
-			dX = -dX;
-
-        // Find the stroke type
-		if ((right && rightForehand) || (left && !rightForehand)) {
-			return detectStroke(Point.FOREHAND_STROKES, distance(dX, dY), angle(dX, dY));
-		} else if (left || right) {
-			return detectStroke(Point.BACKHAND_STROKES, distance(dX, dY), angle(dX, dY));
-		} else {
-			return detectCenterStroke(dX, dY);
-		}
-	}
-
-    private void recordServe(Point.ServeDirection dir) {
-        float dX = mGestureStart.x  - mGestureEnd.x;
-        float dY = mGestureStart.y  - mGestureEnd.y;
-
-        if (distance(dX, dY) > TAP_MAX_DIST) {
-            double angle = angle(dX, dY);
-            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
-                currentPoint.serve(dir, Point.Approach.SERVE_AND_VOLLEY);
-            } else {
-                currentPoint.serve(ServeDirection.UNKNOWN);
+                    // If we're not going to ask the user for the location,
+                    // record it now.
+                    if (!mPrefs.getBoolean("record_shot_locations", true))
+                        recordStroke(null);
+                    break;
+                case SERVE:
+                    recordServe(serveGuide.getServeDirection(event.getX()));
+                    break;
+                default:
+                    break;
             }
+            mActiveGesture = false;
+            nextState();
+        } else if (action == MotionEvent.ACTION_MOVE) {
+            mGestureEnd.x = event.getX();
+            mGestureEnd.y = event.getY();
+            mGestureOverlay.invalidate();
         } else {
-            currentPoint.serve(dir);
+            return super.onTouchEvent(event);
         }
+        return false;
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updateUI();
+    }
 
     @Override
     public void onPointComplete(Point p) {
@@ -490,6 +312,200 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         savePoint();
         endMatch();
     }
+
+	private void newPoint() {
+		currentPoint = new Point();
+	}
+
+	private void savePoint() {
+        try {
+            match.addPoint(currentPoint, matchStorage);
+        } catch (MatchStorageNotAvailableException e) {
+            // TODO: notify the user
+            e.printStackTrace();
+        }
+
+        newPoint();
+
+        if (match.isComplete()) {
+            endMatch();
+        }
+	}
+
+    private void endMatch () {
+        Intent intent = new Intent(this, MatchDetailActivity.class);
+        intent.putExtra("match_id", match.id);
+        intent.putExtra("review", false);
+        startActivity(intent);
+    }
+
+
+	private void updateUI() {
+		serveGuide.setVisibility(View.INVISIBLE);
+		locationGuide.setVisibility(View.INVISIBLE);
+		shotGuide.setVisibility(View.INVISIBLE);
+
+		switch (current_state) {
+		case SERVE:
+			serveGuide.setVisibility(View.VISIBLE);
+			serveGuide.setPoint(match, currentPoint, mPrefs);
+			break;
+		case STROKE:
+			shotGuide.setVisibility(View.VISIBLE);
+			shotGuide.setPoint(match, currentPoint, mPrefs);
+			break;
+		case LOCATION:
+			locationGuide.setVisibility(View.VISIBLE);
+			locationGuide.setPoint(match, currentPoint, mPrefs);
+			break;
+		}
+	}
+
+    private void setState(State s) {
+        current_state = s;
+        updateUI();
+    }
+	
+	private void nextState() {
+		switch (current_state) {
+		case SERVE:
+            current_state = State.STROKE;
+			break;
+		case LOCATION:
+            current_state = State.STROKE;
+			break;
+		case STROKE:
+            if (mPrefs.getBoolean("record_shot_locations", true))
+                current_state = State.LOCATION;
+			break;
+		}
+
+		updateUI();
+	}
+
+
+    private void recordServe(Point.ServeDirection dir) {
+        float dX = mGestureStart.x  - mGestureEnd.x;
+        float dY = mGestureStart.y  - mGestureEnd.y;
+
+        if (distance(dX, dY) > TAP_MAX_DIST) {
+            double angle = angle(dX, dY);
+            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
+                currentPoint.serve(dir, Point.Approach.SERVE_AND_VOLLEY);
+            } else {
+                currentPoint.serve(ServeDirection.UNKNOWN);
+            }
+        } else {
+            currentPoint.serve(dir);
+        }
+    }
+
+    private boolean recordStroke(Direction direction) {
+        return recordStroke(direction, null);
+    }
+
+	/**
+	 * Records the stroke based on the current gesture.
+	 * @param direction direction of the stroke
+     * @param depth depth of the stroke
+	 */
+	private boolean recordStroke(Direction direction, Point.Depth depth) {
+        float dX = mGestureStart.x  - mGestureEnd.x;
+        float dY = mGestureStart.y  - mGestureEnd.y;
+
+        if (distance(dX, dY) < TAP_MAX_DIST) {
+            currentPoint.addStroke(currentStroke, direction, depth);
+        } else { // Find a gesture
+            double angle = angle(dX, dY);
+            if (angle > NET_APPROACH_MIN && angle < NET_APPROACH_MAX) {
+                currentPoint.addStroke(currentStroke, direction, null, Point.Approach.NET_APPROACH);
+            } else if (angle > ALT_STROKE_MIN && angle < ALT_STROKE_MAX) {
+                switch (currentStroke) {
+                    case FOREHAND_GROUNDSTROKE:
+                    case FOREHAND_LOB:
+                    case FOREHAND_DROPSHOT:
+                    case FOREHAND_SLICE:
+                    case BACKHAND_GROUNDSTROKE:
+                    case BACKHAND_LOB:
+                    case BACKHAND_DROPSHOT:
+                    case BACKHAND_SLICE:
+                    case TRICK:
+                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_NET);
+                        break;
+                    default:
+                        currentPoint.addStroke(currentStroke, direction, null, null, Point.NetPosition.AT_BASELINE);
+                        break;
+                }
+            } else {
+                currentPoint.addStroke(currentStroke);
+            }
+        }
+
+		Log.i("Shot", currentPoint.toString());
+
+		return true;
+	}
+
+	private Point.Stroke detectCenterStroke(double distance, double angle) {
+
+		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
+			return Point.Stroke.UNKNOWN;
+
+		if (angle > TRICK_ANGLE || angle < -TRICK_ANGLE)
+			return Point.Stroke.TRICK;
+		else if (angle > 0)
+			return Point.Stroke.FOREHAND_OVERHEAD;
+		else
+			return Point.Stroke.BACKHAND_OVERHEAD;
+	}
+
+    private static double distance(float dX, float dY) {
+        return Math.sqrt(dX*dX + dY*dY);
+    }
+
+    private static double angle(float dX, float dY) {
+        return Math.atan2(dY, dX);
+    }
+
+	private Point.Stroke detectStroke(Point.StrokeIndex index, double distance, double angle) {
+		if (distance < TAP_MAX_DIST * getResources().getDisplayMetrics().density)
+			return index.GROUNDSTROKE;
+
+		if (angle > LOB_MAX || angle < DROP_MIN)
+			return index.SLICE;
+		if (angle > SWINGING_VOLLEY_MAX)
+			return index.LOB;
+		if (angle > SWINGING_VOLLEY_MIN)
+			return index.SWINGINGVOLLEY;
+		if (angle > HALF_VOLLEY_MAX)
+			return index.VOLLEY;
+		if (angle > HALF_VOLLEY_MIN)
+			return index.HALFVOLLEY;
+		if (angle > DROP_MIN)
+			return index.DROPSHOT;
+
+		return Point.Stroke.UNKNOWN;
+	}
+
+	private Point.Stroke detectStroke() {
+		float dX = mGestureStart.x  - mGestureEnd.x;
+		float dY = mGestureStart.y  - mGestureEnd.y;
+		boolean left = mGestureStart.x < centerLegend.getLeft();
+		boolean right = mGestureStart.x > centerLegend.getRight();
+		boolean rightForehand = shotGuide.isRightHanded();
+
+		if (!right)
+			dX = -dX;
+
+        // Find the stroke type
+		if ((right && rightForehand) || (left && !rightForehand)) {
+			return detectStroke(Point.FOREHAND_STROKES, distance(dX, dY), angle(dX, dY));
+		} else if (left || right) {
+			return detectStroke(Point.BACKHAND_STROKES, distance(dX, dY), angle(dX, dY));
+		} else {
+			return detectCenterStroke(dX, dY);
+		}
+	}
 
 	public class GestureOverlay extends View {
 		Paint mPaint = new Paint();
@@ -588,7 +604,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		final float T_LINE_INSET = 40.0f;
 		private TextView serve_l = null;
 		private TextView serve_r = null;
-		
+
 		public ServeGuide(Context context, AttributeSet attrs) {
 			super(context, attrs);
 		}
@@ -612,7 +628,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				else
 					return Point.ServeDirection.T;
 			}
-					
+
 		}
 
 		@Override
@@ -634,7 +650,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				serve_l = ((TextView) this.findViewById(R.id.serve_left_loc));
 			if (serve_r == null)
 				serve_r = ((TextView) this.findViewById(R.id.serve_right_loc));
-			
+
 			if (locNear() == deuce()) {
 				serve_l.setText(R.string.serve_t);
 				serve_r.setText(R.string.serve_wide);
@@ -670,7 +686,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				canvas.drawLine(0.0f, SERVICE_LINE_INSET, w, SERVICE_LINE_INSET, mLinePaint); // service line
 				canvas.drawLine(T_LINE_INSET, SERVICE_LINE_INSET, T_LINE_INSET, h, mLinePaint); // T line
 			}
-			
+
 			this.drawGuides(canvas);
 		}
 	}
@@ -678,14 +694,19 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 	public static class LocationGuide extends GuideView {
 		private TextView shot_l = null;
 		private TextView shot_r = null;
+        private boolean drawDepthGuides;
 
-		public LocationGuide(Context context, AttributeSet attrs) {
+        public LocationGuide(Context context, AttributeSet attrs) {
 			super(context, attrs);
 		}
 
         @Override
         public void setPoint(Match match, Point point, SharedPreferences prefs) {
             super.setPoint(match, point, prefs);
+
+            if (prefs.getBoolean("return_depth", false) && point.shotCount() == 1) {
+                drawDepthGuides = true;
+            }
 
 			if (shot_l == null)
 				shot_l = ((TextView) this.findViewById(R.id.shot_left_loc));
@@ -700,6 +721,27 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				shot_r.setText(R.string.backhand_side);
 			}
 		}
+
+        public Point.Depth getDepth(float x) {
+            float h = (float)this.getHeight();
+            float g1x = h * 0.33f;
+            float g2x = h * 0.66f;
+            if (x >= g1x && x <= g2x) {
+                return Point.Depth.MID;
+            }
+
+            if (locNear()) {
+                if (x < g1x)
+                    return Point.Depth.SHORT;
+                else
+                    return Point.Depth.DEEP;
+            } else {
+                if (x < g1x)
+                    return Point.Depth.SHORT;
+                else
+                    return Point.Depth.DEEP;
+            }
+        }
 
 		public Direction getDirection(float x) {
 			float w = (float)this.getWidth();
@@ -744,7 +786,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				T_y1 = h * 0.66f;
 				T_y2 = h;
 			}
-			
+
 			// Sidelines
 			canvas.drawLine(LINE_WIDTH / 2, 0.0f, LINE_WIDTH / 2, h, mLinePaint);
 			canvas.drawLine(w - LINE_WIDTH / 2, 0.0f, w - LINE_WIDTH / 2, h, mLinePaint);
@@ -754,15 +796,23 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				canvas.drawLine(0.0f, h - LINE_WIDTH / 2, w, h - LINE_WIDTH / 2, mLinePaint);
 			else
 				canvas.drawLine(0.0f, LINE_WIDTH / 2, w, LINE_WIDTH / 2, mLinePaint);
-			
+
 			// Service line
 			canvas.drawLine(0.0f, T_y1, w, T_y1, mLinePaint);
 
 			// T line
 			canvas.drawLine(w / 2, T_y1, w / 2, T_y2, mLinePaint);
 
-			this.drawGuides(canvas);
-			// TODO: Draw horizontal guides if needed
+			// Depth guides
+            if (drawDepthGuides) {
+                float g1y = h * 0.33f;
+                float g2y = h * 0.66f;
+                canvas.drawLine(0.0f, g1y, w, g1y, mGuidePaint);
+                canvas.drawLine(0.0f, g2y, w, g2y, mGuidePaint);
+            }
+
+            this.drawGuides(canvas);
+
 		}
 	}
 
@@ -783,7 +833,7 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 				right_hand = ((TextView) this.findViewById(R.id.right_hand));
 			if (left_hand == null)
 				left_hand = ((TextView) this.findViewById(R.id.left_hand));
-			
+
 			if (strokeNear() == strokeRightHanded) {
 				left_hand.setText(R.string.backhand);
 				right_hand.setText(R.string.forehand);

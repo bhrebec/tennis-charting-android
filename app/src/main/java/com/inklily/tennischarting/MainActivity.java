@@ -8,7 +8,6 @@ package com.inklily.tennischarting;
  *    c. Insert point
  *    d. Delete all matches
  * 6. New match screen
- *    a. Need to be able to access from review
  *    b. Need to require player names to be entered
  * 9. Data model
  *    b. Test first serves
