@@ -695,9 +695,12 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
 		private TextView shot_l = null;
 		private TextView shot_r = null;
         private boolean drawDepthGuides;
+        private Paint mDepthPaint;
 
         public LocationGuide(Context context, AttributeSet attrs) {
 			super(context, attrs);
+            mDepthPaint = new Paint(mGuidePaint);
+            mDepthPaint.setColor(Color.rgb(200, 255, 200));
 		}
 
         @Override
