@@ -212,8 +212,8 @@ public class MatchChartActivity extends FragmentActivity implements OnPointEndLi
         if (mMatch != null && mMatch.id != null)
             outState.putLong("match_id", mMatch.id);
         outState.putString("state", mCurrentState.toString());
-        outState.putString("current_point", mCurrentPoint.toString());
-        outState.putString("current_stroke", mCurrentStroke.toString());
+        outState.putString("current_point", mCurrentPoint == null ? "" : mCurrentPoint.toString());
+        outState.putString("current_stroke", mCurrentStroke == null ? "" : mCurrentStroke.toString());
     }
 
     @Override

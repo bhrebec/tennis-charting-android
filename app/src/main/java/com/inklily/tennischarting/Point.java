@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class Point {
 	public Integer seq;
-	private StringBuilder data;
+	private StringBuilder mData;
 
 	public String comments = "";
 	
@@ -189,11 +189,11 @@ public class Point {
 	 * @param point string representation of the point
 	 */
 	public Point(String point) {
-		data = new StringBuilder(point);
+		mData = new StringBuilder(point);
 	}
 
 	public void givePoint(Point.PointGiven pg) {
-		data = new StringBuilder().append(pg);
+		mData = new StringBuilder().append(pg);
 	}
 
     public void serve(Point.ServeDirection sd) {
@@ -202,9 +202,9 @@ public class Point {
 
     public void serve(Point.ServeDirection sd, Approach np) {
         if (sd != null) {
-            data.append(sd.asChar());
+            mData.append(sd.asChar());
             if (np != null) {
-                data.append(np.asChar());
+                mData.append(np.asChar());
             }
         }
     }
@@ -213,8 +213,8 @@ public class Point {
 	 * Adds a letchord. Will destroy any non-letchord strokes in the point.
 	 */
 	public void addLetchord() {
-		data = new StringBuilder(data.toString().replaceAll("[^c]", ""));
-		data.append(Stroke.LETCORD.asChar());
+		mData = new StringBuilder(mData.toString().replaceAll("[^c]", ""));
+		mData.append(Stroke.LETCORD.asChar());
 	}
 
 	public void addStroke(Point.Stroke s) {
@@ -239,15 +239,15 @@ public class Point {
 		}
 
 		reopenPoint();
-		data.append(s.asChar());
+		mData.append(s.asChar());
         if (approach != null)
-            data.append(approach.asChar());
+            mData.append(approach.asChar());
         if (np != null)
-            data.append(np.asChar());
+            mData.append(np.asChar());
         if (dir != null)
-            data.append(dir.asChar());
+            mData.append(dir.asChar());
 		if (d != null)
-			data.append(d.asChar());
+			mData.append(d.asChar());
 	}
 	
 	/**
@@ -267,16 +267,16 @@ public class Point {
 
 	public void endPoint(Point.PointOutcome o, Point.ErrorType et) {
 		// Remove any existing point end
-		Matcher m = ENDING_PATTERN.matcher(data);
+		Matcher m = ENDING_PATTERN.matcher(mData);
 		while (m.find())
-			data.delete(m.start(), m.end());
+			mData.delete(m.start(), m.end());
 
 		if (o != null) {
-			data.append(o.asChar());
+			mData.append(o.asChar());
 			if (o != PointOutcome.WINNER && et != null)
-				data.append(et.asChar());
+				mData.append(et.asChar());
 		} else if (et != null) {
-			data.append(et.asChar());
+			mData.append(et.asChar());
 		}
 	}
 
@@ -284,16 +284,16 @@ public class Point {
      * @return 1 if the server won the point, 2 if the returner, 0 if the point isn't over
      */
 	public PointWinner winner() {
-		if (data.length() == 0 || !isValid())
+		if (mData.length() == 0 || !isValid())
 			return PointWinner.NONE;
 
-		char first = data.charAt(0);
+		char first = mData.charAt(0);
 		if (first == PointGiven.POINT_RETURNER.asChar() || first == PointGiven.POINT_RETURNER_PENALTY.asChar()) {
 			return PointWinner.RETURNER;
 		} else if (first == PointGiven.POINT_SERVER.asChar() || first == PointGiven.POINT_SERVER_PENALTY.asChar()) {
 			return PointWinner.SERVER;
 		} else {
-			Matcher m = ENDING_PATTERN.matcher(data);
+			Matcher m = ENDING_PATTERN.matcher(mData);
 			if (!m.find()) {
 				// Point isn't over
 				return PointWinner.NONE;
@@ -319,7 +319,7 @@ public class Point {
 
 	public int shotCount() {
 		// Remove letchords,  they mess up the count
-		String clean_data = data.toString().replace("c", "");
+		String clean_data = mData.toString().replace("c", "");
 		if (clean_data.length() == 0
                 || !SERVE_PATTERN.matcher(clean_data).find())
 			return 0;
@@ -328,11 +328,11 @@ public class Point {
 	}
 
 	public void setPoint(String point) {
-		data = new StringBuilder(point);
+		mData = new StringBuilder(point);
 	}
 	
 	public String toString() {
-		return data.toString();
+		return mData.toString();
 	}
 	
 	public boolean isFault() {
@@ -340,7 +340,7 @@ public class Point {
 	}
 	
 	public boolean isValid() {
-		return POINT_PATTERN.matcher(data).matches();
+		return POINT_PATTERN.matcher(mData).matches();
 	}
 
     /**

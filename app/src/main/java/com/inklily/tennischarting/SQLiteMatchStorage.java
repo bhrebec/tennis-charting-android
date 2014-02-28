@@ -133,7 +133,6 @@ public class SQLiteMatchStorage extends BaseAdapter implements MatchStorage {
         mAvailableListeners = new ArrayList<OnStorageAvailableListener>();
 		mHelper = MatchSQLHelper.makeHelper(cxt);
 		new DBOpenAsync().execute(mHelper);
-		// mDb = helper.getWritableDatabase();
         mContext = cxt;
 	}
 

@@ -180,6 +180,7 @@ public class MatchInfoActivity extends Activity implements OnClickListener, Matc
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setPositiveButton(android.R.string.ok, null);
             builder.setMessage(getString(R.string.player_name_warning));
+            builder.show();
             return;
         }
 
