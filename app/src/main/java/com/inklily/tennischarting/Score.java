@@ -45,8 +45,26 @@ public class Score {
 		reset_score();
 	}
 
+    public int winner() {
+        int sets_p1 = 0;
+        int sets_p2 = 0;
+        for (int i = 0; i < mCurrentSet; i++) {
+            if (mP1Games[i] > mP2Games[i])
+                sets_p1++;
+            else
+                sets_p2++;
+        }
+
+        if (sets_p1 > mSets / 2)
+            return 1;
+        else if (sets_p2 > mSets / 2)
+            return 2;
+        else
+            return 0;
+    }
+
     public boolean isComplete() {
-        return mCurrentSet >= mSets;
+        return mCurrentSet >= mSets || winner() != 0;
     }
 
 	

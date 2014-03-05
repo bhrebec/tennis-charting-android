@@ -256,6 +256,7 @@ public class Match {
             fos.close();
 
             intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getResources().getString(R.string.submit_email_address)});
             intent.putExtra(Intent.EXTRA_SUBJECT, String.format("[Tennis Chart App] %s vs. %s", player1, player2));
             intent.putExtra(Intent.EXTRA_TEXT, name + "\n\nCharted by " + charted_by);
             intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));

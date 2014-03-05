@@ -1,14 +1,13 @@
 apply plugin: 'android'
 gradle.taskGraph.whenReady { taskGraph ->
   if(taskGraph.hasTask(':app:assembleRelease')) {
-      def keyfile = new String(System.console().readLine("\n\$ Enter keystore path: "))
-      def storepass = new String(System.console().readLine("\n\$ Enter keystore password: "))
-      def keyalias = new String(System.console().readLine("\n\$ Enter key alias: "))
-      def keypass = new String(System.console().readLine("\n\$ Enter key password: "))
-      android.signingConfigs.release.storeFile file(keyfile)
+      def storepass = new String(System.console().readPassword("\n\$ Enter keystore password: "))
+      def keypass = new String(System.console().readPassword("\n\$ Enter key password: "))
       android.signingConfigs.release.storePassword storepass
-      android.signingConfigs.release.keyAlias keyalias
       android.signingConfigs.release.keyPassword keypass
+      android.signingConfigs.release.storeFile file(System.getenv("KEYSTORE"))
+      android.signingConfigs.release.keyAlias System.getenv("KEYALIAS")
+
   }
 }
 android {
@@ -23,14 +22,17 @@ android {
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
+    signingConfigs {
+        release {
+        }
+    }
     buildTypes {
         release {
             runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt')
+            signingConfig signingConfigs.release
+            zipAlign true
         }
-    }
-    signingConfigs {
-        release {}
     }
 }
 
